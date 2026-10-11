@@ -1,0 +1,882 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Jelajah Jabar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Konsep: portal wisata dataran tinggi dan pantai selatan. Latar hijau teh yang sangat pucat, aksen hijau-teal, sorotan kuning matahari terbit. */
+:root{
+  --bg:#F2F5F1; --surface:#FFFFFF; --surface2:#E8EFE8; --ink:#14251E; --muted:#51635A; --line:#D3DDD4;
+  --accent:#0E7C6B; --accent-ink:#FFFFFF; --accent-soft:#D5EEE7;
+  --warm:#E2A03B; --warm-soft:#FBEBCB; --warm-ink:#6B4300;
+  --good:#1F7A4D; --bad:#B4432F;
+  --shadow:0 1px 2px rgba(20,37,30,.06),0 8px 24px rgba(20,37,30,.07);
+  --art-filter:none;
+  --f-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --f-body:'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1613; --surface:#14211C; --surface2:#1B2B25; --ink:#E5EFE9; --muted:#9BB0A6; --line:#26382F;
+    --accent:#4CC3A9; --accent-ink:#06231C; --accent-soft:#17352D;
+    --warm:#F0B857; --warm-soft:#3A2D12; --warm-ink:#F6D9A0;
+    --good:#5FD08F; --bad:#F08A73;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
+    --art-filter:brightness(.82) saturate(1.05);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1613; --surface:#14211C; --surface2:#1B2B25; --ink:#E5EFE9; --muted:#9BB0A6; --line:#26382F;
+  --accent:#4CC3A9; --accent-ink:#06231C; --accent-soft:#17352D;
+  --warm:#F0B857; --warm-soft:#3A2D12; --warm-ink:#F6D9A0;
+  --good:#5FD08F; --bad:#F08A73;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
+  --art-filter:brightness(.82) saturate(1.05);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.6 var(--f-body);-webkit-text-size-adjust:100%}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.15;margin:0;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1120px;margin-inline:auto;padding-inline:clamp(16px,4vw,32px)}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* navigasi */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:16px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;font:800 20px/1 var(--f-display);color:var(--ink);letter-spacing:-.02em}
+.brand svg{width:30px;height:30px;flex:none}
+.nav ul{display:flex;gap:4px;list-style:none;margin:0 0 0 auto;padding:0;flex-wrap:wrap}
+.nav li button{background:none;border:0;padding:8px 12px;border-radius:999px;font-weight:600;color:var(--muted)}
+.nav li button:hover{color:var(--ink);background:var(--surface2)}
+.nav li button[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+
+/* tombol */
+.btn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:11px 20px;border-radius:999px;font-weight:700}
+.btn:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.ghost:hover{background:var(--accent-soft);filter:none}
+.btn.small{padding:7px 14px;font-size:13px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(20px,4vw,48px);align-items:center;padding-block:clamp(28px,6vw,64px)}
+.hero h1{font-size:clamp(32px,5.4vw,56px);font-weight:800;margin:10px 0 14px}
+.hero p.lead{font-size:17px;color:var(--muted);max-width:52ch}
+.hero .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.hero-art{border-radius:24px;overflow:hidden;box-shadow:var(--shadow);aspect-ratio:4/3;max-width:100%}
+.hero-art svg{display:block;width:100%;height:100%}
+.facts{display:flex;gap:6px 22px;flex-wrap:wrap;margin-top:22px;color:var(--muted);font-size:14px}
+.facts b{color:var(--ink)}
+.notice{background:var(--warm-soft);color:var(--warm-ink);border-radius:12px;padding:10px 14px;font-size:13.5px}
+
+/* seksi */
+.section{padding-block:clamp(22px,4vw,44px)}
+.sec-head{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.sec-head h2{font-size:clamp(24px,3.4vw,34px);font-weight:700}
+.page-title{font-size:clamp(28px,4.4vw,42px);font-weight:800}
+.page-intro{max-width:62ch;color:var(--muted);margin-top:8px}
+.pagehead{padding-block:clamp(24px,4vw,40px) 8px}
+
+/* kartu */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;display:flex;flex-direction:column;min-width:0;transition:transform .15s ease}
+.card:hover{transform:translateY(-3px)}
+.art{position:relative;aspect-ratio:16/9;background:var(--surface2);overflow:hidden;max-width:100%}
+.art svg{display:block;width:100%;height:100%;filter:var(--art-filter)}
+.tag{position:absolute;left:10px;top:10px;background:var(--surface);color:var(--ink);font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}
+.card-b{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.card-b h3{font-size:19px;font-weight:700}
+.meta{display:flex;flex-wrap:wrap;gap:4px 14px;list-style:none;margin:6px 0 0;padding:0;font-size:13px;color:var(--muted)}
+.meta li{display:inline-flex;align-items:center;gap:5px}
+.ic{width:15px;height:15px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.ic.fill{fill:currentColor;stroke:none}
+.star{color:var(--warm)}
+.cat-card{display:flex;flex-direction:column;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:0;overflow:hidden;box-shadow:var(--shadow);color:var(--ink)}
+.cat-card .art{aspect-ratio:2/1}
+.cat-card .cb{padding:10px 14px 12px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cat-card strong{font-family:var(--f-display);font-size:17px}
+
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;counter-increment:s}
+.steps li::before{content:counter(s);display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:800;margin-bottom:10px}
+.steps h3{font-size:18px;margin-bottom:4px}
+
+/* tab */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 22px}
+.tabs button,.chip-btn{border:1.5px solid var(--line);background:var(--surface);padding:7px 14px;border-radius:999px;font-weight:600;font-size:14px;color:var(--ink)}
+.tabs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+
+/* form */
+.formgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(16px,3vw,24px);box-shadow:var(--shadow);min-width:0}
+.panel + .panel{margin-top:16px}
+.panel h3{font-size:20px;margin-bottom:4px}
+.panel .hint{color:var(--muted);font-size:13.5px;margin-bottom:14px}
+.field{margin-top:16px}
+.field > label,.field > .lbl{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+select{width:100%;max-width:100%;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:9px 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{position:relative}
+.chips input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.chips span{display:inline-block;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
+.chips input:checked + span{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.chips input:focus-visible + span{outline:3px solid var(--accent);outline-offset:2px}
+.slider-row{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:10px 16px;align-items:end;margin-top:20px}
+.slider-row .lbl{font-weight:700;font-size:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.slider-row .lbl output{font-weight:600;color:var(--accent);font-size:13.5px}
+.poles{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:2px}
+input[type=range]{width:100%;accent-color:var(--accent);margin:8px 0 0}
+.imp label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:3px}
+.radios{display:grid;gap:8px}
+.radios label{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}
+.radios input{margin-top:4px;accent-color:var(--accent)}
+.radios label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.radios small{display:block;color:var(--muted);font-size:12.5px}
+.presets{display:flex;gap:8px;flex-wrap:wrap}
+.chip-btn:hover{border-color:var(--accent);color:var(--accent)}
+.sticky-side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.side-note{font-size:13px;color:var(--muted);margin-top:12px}
+
+/* hasil */
+.summary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.wbars{display:grid;gap:7px}
+.wbar{display:grid;grid-template-columns:120px minmax(0,1fr) 42px;gap:10px;align-items:center;font-size:13px}
+.wbar i{display:block;height:8px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.wbar i b{display:block;height:100%;background:var(--accent);border-radius:99px}
+.pill{display:inline-block;background:var(--surface2);border-radius:999px;padding:3px 11px;font-size:13px;font-weight:600;margin:0 6px 6px 0}
+.banner{border-radius:14px;padding:14px 16px;margin:18px 0;background:var(--accent-soft);color:var(--ink);border:1px solid var(--accent)}
+.banner b{color:var(--accent)}
+.res-card{display:flex;flex-direction:column}
+.res-card .card-b{gap:8px}
+.badge{display:inline-block;background:var(--warm);color:#2D1D00;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;align-self:flex-start}
+.rank{position:absolute;right:10px;top:10px;background:var(--ink);color:var(--bg);font:800 14px var(--f-display);min-width:32px;height:32px;display:grid;place-items:center;border-radius:50%}
+.score{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px;color:var(--muted)}
+.score i{display:block;height:7px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.score i b{display:block;height:100%;background:var(--accent)}
+.why{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:3px;font-size:13.5px}
+.why li{display:flex;gap:7px;align-items:flex-start}
+.why .ok{color:var(--good)}
+.why .no{color:var(--bad)}
+.why svg{margin-top:3px}
+.rows{display:grid;gap:8px}
+.row{display:grid;grid-template-columns:36px minmax(0,1fr) 150px;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;cursor:pointer;text-align:left;width:100%}
+.row:hover{border-color:var(--accent)}
+.row .score{grid-template-columns:minmax(0,1fr) auto}
+.row .r{font:800 16px var(--f-display);color:var(--muted)}
+.row .n{min-width:0}
+.row .n strong{display:block;overflow-wrap:anywhere}
+.empty{background:var(--surface);border:1.5px dashed var(--line);border-radius:18px;padding:32px 20px;text-align:center}
+details.calc{margin-top:26px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 18px}
+details.calc summary{cursor:pointer;font-weight:700}
+.tbl{overflow-x:auto;margin-top:12px;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:480px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+td.r,th.r{text-align:right}
+code,.formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13.5px;background:var(--surface2);border-radius:8px;padding:2px 7px}
+.formula{display:block;padding:10px 14px;margin:8px 0;overflow-x:auto;max-width:100%}
+.prose{max-width:72ch}
+.prose h2{font-size:26px;margin:34px 0 10px}
+.prose p{margin:8px 0}
+.prose ol{padding-left:22px;margin:10px 0}
+.prose li{margin:8px 0}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(8,16,12,.62);display:grid;place-items:center;padding:16px}
+.modal-box{background:var(--surface);color:var(--ink);border-radius:22px;max-width:640px;width:100%;max-height:calc(100% - 8px);overflow:auto;box-shadow:var(--shadow)}
+.modal-box .art{aspect-ratio:16/8}
+.modal-body{padding:20px 22px 24px;display:grid;gap:12px}
+.modal-body h2{font-size:28px;font-weight:800}
+.close{position:absolute;right:10px;top:10px;z-index:2;border:0;background:var(--surface);color:var(--ink);width:36px;height:36px;border-radius:50%;font-size:18px;font-weight:700}
+.attrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.attr{background:var(--surface2);border-radius:12px;padding:10px 12px}
+.attr small{display:block;color:var(--muted);font-size:12px}
+.attr strong{font-size:16px}
+.dots{display:inline-flex;gap:3px;vertical-align:middle;margin-left:6px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--accent)}
+
+footer{margin-top:40px;border-top:1px solid var(--line);padding-block:22px;color:var(--muted);font-size:13.5px}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr}
+  .formgrid{grid-template-columns:1fr}
+  .sticky-side{position:static}
+  .summary{grid-template-columns:1fr}
+  .nav ul{margin-left:0;width:100%}
+}
+@media (max-width:560px){
+  .slider-row{grid-template-columns:1fr}
+  .row{grid-template-columns:30px minmax(0,1fr)}
+  .row .score{grid-column:1 / -1}
+  .wbar{grid-template-columns:96px minmax(0,1fr) 38px}
+}
+@media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+</style>
+
+<header class="nav">
+  <div class="wrap">
+    <button class="brand" data-go="beranda" aria-label="Jelajah Jabar, ke beranda">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" style="fill:var(--accent)"/><path d="M3 24 11 12l5 7 3-4 10 9z" style="fill:var(--accent-ink)" opacity=".92"/><circle cx="23" cy="9" r="3" style="fill:var(--warm)"/></svg>
+      Jelajah Jabar
+    </button>
+    <nav aria-label="Menu utama">
+      <ul>
+        <li><button data-go="beranda">Beranda</button></li>
+        <li><button data-go="katalog">Katalog</button></li>
+        <li><button data-go="rekomendasi">Cari rekomendasi</button></li>
+        <li><button data-go="carakerja">Cara kerja</button></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- BERANDA -->
+<section id="page-beranda" class="wrap">
+  <div class="hero">
+    <div>
+      <span class="eyebrow">Wisata Jawa Barat</span>
+      <h1>Pilih tujuan liburan yang cocok dengan caramu berlibur</h1>
+      <p class="lead">Atur seberapa dekat, seberapa sejuk, dan seberapa ramai tempat yang kamu mau. Sistem membandingkan semua destinasi dan menyusun peringkatnya untukmu.</p>
+      <div class="cta">
+        <button class="btn" data-go="rekomendasi">Cari rekomendasi</button>
+        <button class="btn ghost" data-go="katalog">Lihat katalog</button>
+      </div>
+      <p class="facts"><span><b id="f-n">25</b> destinasi</span><span><b>5</b> jenis wisata</span><span><b>6</b> faktor penilaian</span></p>
+    </div>
+    <div class="hero-art" id="hero-art"></div>
+  </div>
+  <p class="notice">Ini prototipe tugas kuliah. Data destinasi, harga, suhu, dan tingkat keramaian adalah data contoh yang belum diverifikasi.</p>
+
+  <div class="section">
+    <div class="sec-head"><h2>Jelajahi menurut jenis</h2></div>
+    <div class="grid" id="cat-grid"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><h2>Cara memilih di sini</h2></div>
+    <ol class="steps">
+      <li><h3>Atur preferensi</h3><p class="muted">Geser slider untuk jarak, suhu, keramaian, dan fasilitas. Tandai faktor mana yang paling penting.</p></li>
+      <li><h3>Sistem menghitung</h3><p class="muted">Metode VIKOR menilai tiap destinasi terhadap kondisi idealmu dan mencari yang paling seimbang.</p></li>
+      <li><h3>Bandingkan hasil</h3><p class="muted">Lihat peringkat, alasan setiap rekomendasi, dan angka perhitungannya.</p></li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><h2>Rating tertinggi</h2><button class="btn ghost small" data-go="katalog">Semua destinasi</button></div>
+    <div class="grid" id="featured"></div>
+  </div>
+</section>
+
+<!-- KATALOG -->
+<section id="page-katalog" class="wrap" hidden>
+  <div class="pagehead">
+    <h1 class="page-title">Katalog destinasi</h1>
+    <p class="page-intro">Daftar destinasi wisata Jawa Barat dalam sistem. Klik kartu untuk melihat detail. Untuk peringkat yang disesuaikan, buka halaman Cari rekomendasi.</p>
+  </div>
+  <div class="tabs" id="tabs" role="group" aria-label="Filter jenis wisata"></div>
+  <div class="grid" id="katalog-grid"></div>
+</section>
+
+<!-- REKOMENDASI -->
+<section id="page-rekomendasi" class="wrap" hidden>
+  <div class="pagehead">
+    <h1 class="page-title">Cari rekomendasi</h1>
+    <p class="page-intro">Atur pilihanmu di bawah. Tidak perlu mengetik apa pun.</p>
+  </div>
+  <div class="panel" style="margin-bottom:16px">
+    <div class="eyebrow" style="margin-bottom:8px">Contoh cepat</div>
+    <div class="presets" id="presets"></div>
+  </div>
+  <form id="form" class="formgrid" autocomplete="off">
+    <div>
+      <div class="panel">
+        <h3>1. Saring dulu</h3>
+        <p class="hint">Destinasi di luar pilihan ini tidak ikut dinilai.</p>
+        <div class="field"><span class="lbl">Jenis wisata</span><div class="chips" id="chips-jenis"></div></div>
+        <div class="field"><label for="f-asal">Berangkat dari</label><select id="f-asal"></select></div>
+        <div class="field">
+          <label for="f-biaya">Anggaran maksimal per orang: <output id="o-biaya" class="num" style="color:var(--accent)"></output></label>
+          <input type="range" id="f-biaya" min="10000" max="250000" step="5000" value="50000">
+          <div class="poles"><span>Rp10.000</span><span>Tanpa batas</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>2. Atur preferensi</h3>
+        <p class="hint">Geser ke arah yang kamu suka. Pilihan di kanan menentukan seberapa besar faktor itu memengaruhi peringkat.</p>
+
+        <div class="slider-row">
+          <div><div class="lbl"><label for="f-jarak">Jarak</label><output id="o-jarak" class="num"></output></div>
+            <input type="range" id="f-jarak" min="0" max="300" step="10" value="60"><div class="poles"><span>Dekat</span><span>Jauh</span></div></div>
+          <div class="imp"><label for="p-jarak">Seberapa penting?</label><select id="p-jarak"></select></div>
+        </div>
+
+        <div class="slider-row">
+          <div><div class="lbl"><label for="f-suhu">Suasana</label><output id="o-suhu" class="num"></output></div>
+            <input type="range" id="f-suhu" min="16" max="30" step="1" value="20"><div class="poles"><span>Sejuk</span><span>Hangat</span></div></div>
+          <div class="imp"><label for="p-suhu">Seberapa penting?</label><select id="p-suhu"></select></div>
+        </div>
+
+        <div class="slider-row">
+          <div><div class="lbl"><label for="f-ramai">Keramaian</label><output id="o-ramai" class="num"></output></div>
+            <input type="range" id="f-ramai" min="1" max="5" step="1" value="2"><div class="poles"><span>Sepi</span><span>Ramai</span></div></div>
+          <div class="imp"><label for="p-ramai">Seberapa penting?</label><select id="p-ramai"></select></div>
+        </div>
+
+        <div class="slider-row">
+          <div><div class="lbl"><label for="f-fas">Fasilitas</label><output id="o-fas" class="num"></output></div>
+            <input type="range" id="f-fas" min="1" max="5" step="1" value="3"><div class="poles"><span>Sederhana</span><span>Lengkap</span></div></div>
+          <div class="imp"><label for="p-fas">Seberapa penting?</label><select id="p-fas"></select></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>3. Faktor lain</h3>
+        <div class="slider-row" style="margin-top:12px">
+          <div><div class="lbl">Harga tiket yang murah</div><p class="muted" style="font-size:13px">Makin murah makin baik.</p></div>
+          <div class="imp"><label for="p-biaya">Seberapa penting?</label><select id="p-biaya"></select></div>
+        </div>
+        <div class="slider-row">
+          <div><div class="lbl">Rating tinggi</div><p class="muted" style="font-size:13px">Makin tinggi makin baik.</p></div>
+          <div class="imp"><label for="p-rating">Seberapa penting?</label><select id="p-rating"></select></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="sticky-side">
+      <div class="panel">
+        <h3>4. Gaya memilih</h3>
+        <div class="radios" style="margin-top:12px">
+          <label><input type="radio" name="gaya" value="0.5" checked><span>Seimbang<small>Kompromi antara total nilai dan kekurangan terbesar.</small></span></label>
+          <label><input type="radio" name="gaya" value="0.2"><span>Hindari kekurangan besar<small>Tidak mau ada satu faktor yang sangat buruk.</small></span></label>
+          <label><input type="radio" name="gaya" value="0.8"><span>Unggul di banyak hal<small>Utamakan total nilai terbaik.</small></span></label>
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit">Cari rekomendasi</button>
+          <button class="btn ghost" type="button" id="btn-reset">Atur ulang</button>
+        </div>
+        <p class="side-note" id="form-msg" role="status"></p>
+      </div>
+    </aside>
+  </form>
+</section>
+
+<!-- HASIL -->
+<section id="page-hasil" class="wrap" hidden>
+  <div class="pagehead">
+    <div class="eyebrow">Hasil perhitungan VIKOR</div>
+    <h1 class="page-title">Rekomendasi untukmu</h1>
+  </div>
+  <div id="hasil-body"></div>
+</section>
+
+<!-- CARA KERJA -->
+<section id="page-carakerja" class="wrap" hidden>
+  <div class="pagehead">
+    <h1 class="page-title">Cara kerja sistem</h1>
+    <p class="page-intro">Sistem ini memakai satu metode pengambilan keputusan multikriteria, yaitu VIKOR. Berikut urutan kerjanya dari pilihanmu sampai peringkat.</p>
+  </div>
+  <div class="prose" style="padding-bottom:20px">
+    <h2>Dari pilihan menjadi angka</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Kontrol</th><th>Menjadi</th></tr></thead>
+      <tbody>
+        <tr><td>Jenis wisata, anggaran maksimal</td><td>Filter kandidat</td></tr>
+        <tr><td>Slider jarak, suhu, keramaian, fasilitas</td><td>Nilai target yang diinginkan</td></tr>
+        <tr><td>Seberapa penting (Abaikan, Biasa, Penting, Sangat penting)</td><td>Poin 0, 1, 2, 3, lalu dibagi total menjadi bobot</td></tr>
+        <tr><td>Gaya memilih</td><td>Parameter v (0,2, 0,5, atau 0,8)</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>Lima langkah VIKOR</h2>
+    <ol>
+      <li>Untuk setiap faktor, tentukan nilai terbaik (f*) dan terburuk (f⁻) di antara destinasi yang lolos filter.</li>
+      <li>Hitung jarak ke ideal tiap faktor:
+        <span class="formula">d = (f* − x) / (f* − f⁻)</span>
+        Faktor bertarget memakai selisih <code>|nilai − target|</code> sebagai biaya, jadi makin kecil selisihnya makin baik.</li>
+      <li>Hitung dua ukuran tiap destinasi:
+        <span class="formula">S = Σ (bobot × d)   ·   R = maks (bobot × d)</span>
+        S adalah total kekurangan, R adalah kekurangan terbesar pada satu faktor.</li>
+      <li>Gabungkan menjadi indeks kompromi:
+        <span class="formula">Q = v·(S − S*)/(S⁻ − S*) + (1 − v)·(R − R*)/(R⁻ − R*)</span></li>
+      <li>Urutkan Q dari kecil ke besar. Q terkecil adalah yang terbaik. Lalu uji dua syarat di bawah.</li>
+    </ol>
+
+    <h2>Dua syarat hasil</h2>
+    <p><b>Keunggulan.</b> Selisih Q peringkat 2 dan 1 harus sebesar <code>1/(m − 1)</code> atau lebih, dengan m jumlah kandidat.</p>
+    <p><b>Kestabilan.</b> Peringkat 1 harus juga terbaik menurut S atau R.</p>
+    <p>Jika keduanya terpenuhi, satu destinasi unggul jelas. Jika tidak, sistem menampilkan beberapa destinasi sebagai pilihan setara.</p>
+
+    <h2>Batasan prototipe</h2>
+    <ul>
+      <li>Data destinasi adalah contoh dan belum diverifikasi.</li>
+      <li>Jarak adalah jarak garis lurus dari kota asal, bukan jarak jalan.</li>
+      <li>Penggunaan nilai target adalah penyesuaian terhadap VIKOR standar yang hanya mengenal faktor untung dan biaya. Penyesuaian ini perlu dijelaskan di laporan.</li>
+      <li>Skor relatif di hasil dihitung dari 1 − Q, jadi hanya membandingkan antarkandidat pada pencarian yang sama.</li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">Jelajah Jabar, prototipe sistem rekomendasi wisata dengan metode VIKOR. Data contoh untuk keperluan tugas.</div></footer>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-title">
+  <div class="modal-box" style="position:relative">
+    <button class="close" id="m-close" aria-label="Tutup detail">✕</button>
+    <div id="m-content"></div>
+  </div>
+</div>
+
+<script>
+// ============ <core> DATA DAN LOGIKA VIKOR ============
+const JENIS = ['Pantai','Pegunungan','Air & Danau','Taman & Keluarga','Budaya & Sejarah'];
+
+// Data contoh. biaya = perkiraan per orang (Rp), suhu = rata-rata (°C), keramaian dan fasilitas = skala 1-5.
+const DESTINASI = [
+ {id:1,nama:'Kawah Putih',jenis:'Pegunungan',wilayah:'Ciwidey, Kab. Bandung',lat:-7.166,lon:107.402,biaya:30000,rating:4.6,suhu:17,keramaian:4,fasilitas:4,deskripsi:'Kawah berair putih kehijauan di dataran tinggi Ciwidey, dikelilingi hutan cemara.'},
+ {id:2,nama:'Gunung Tangkuban Parahu',jenis:'Pegunungan',wilayah:'Lembang, Kab. Bandung Barat',lat:-6.760,lon:107.610,biaya:30000,rating:4.5,suhu:17,keramaian:4,fasilitas:5,deskripsi:'Gunung api dengan kawah yang bisa dilihat dari bibir kawah dan jalur jalan kaki pendek.'},
+ {id:3,nama:'Gunung Papandayan',jenis:'Pegunungan',wilayah:'Cisurupan, Kab. Garut',lat:-7.320,lon:107.730,biaya:25000,rating:4.7,suhu:16,keramaian:3,fasilitas:3,deskripsi:'Kawasan kawah belerang dan hutan mati dengan jalur pendakian ramah pemula.'},
+ {id:4,nama:'Kebun Raya Cibodas',jenis:'Pegunungan',wilayah:'Cipanas, Kab. Cianjur',lat:-6.744,lon:107.003,biaya:20000,rating:4.5,suhu:18,keramaian:3,fasilitas:4,deskripsi:'Kebun botani di lereng Gunung Gede dengan udara sejuk dan koleksi tumbuhan dataran tinggi.'},
+ {id:5,nama:'Sari Ater Hot Spring',jenis:'Pegunungan',wilayah:'Ciater, Kab. Subang',lat:-6.740,lon:107.654,biaya:45000,rating:4.4,suhu:21,keramaian:4,fasilitas:5,deskripsi:'Pemandian air panas alami di kawasan perkebunan teh.'},
+ {id:6,nama:'Situ Patenggang',jenis:'Air & Danau',wilayah:'Ciwidey, Kab. Bandung',lat:-7.168,lon:107.356,biaya:20000,rating:4.6,suhu:18,keramaian:3,fasilitas:3,deskripsi:'Danau di tengah perkebunan teh dengan perahu wisata dan pulau kecil di tengahnya.'},
+ {id:7,nama:'Curug Cimahi',jenis:'Air & Danau',wilayah:'Cisarua, Kab. Bandung Barat',lat:-6.806,lon:107.555,biaya:20000,rating:4.4,suhu:21,keramaian:3,fasilitas:4,deskripsi:'Air terjun tinggi yang mudah dijangkau dari jalan utama, dengan area kuliner di dekatnya.'},
+ {id:8,nama:'Situ Cileunca',jenis:'Air & Danau',wilayah:'Pangalengan, Kab. Bandung',lat:-7.190,lon:107.556,biaya:15000,rating:4.5,suhu:19,keramaian:2,fasilitas:3,deskripsi:'Danau luas di antara kebun teh Pangalengan, cocok untuk bersantai dan arung jeram di sungai sekitarnya.'},
+ {id:9,nama:'Green Canyon (Cukang Taneuh)',jenis:'Air & Danau',wilayah:'Cijulang, Kab. Pangandaran',lat:-7.750,lon:108.471,biaya:100000,rating:4.6,suhu:28,keramaian:3,fasilitas:3,deskripsi:'Ngarai berair hijau yang dijelajahi dengan perahu dan susur sungai.'},
+ {id:10,nama:'Pantai Pangandaran',jenis:'Pantai',wilayah:'Kab. Pangandaran',lat:-7.688,lon:108.656,biaya:20000,rating:4.4,suhu:30,keramaian:5,fasilitas:5,deskripsi:'Pantai dengan dua sisi, banyak penginapan, kuliner laut, dan aktivitas air.'},
+ {id:11,nama:'Pantai Batu Karas',jenis:'Pantai',wilayah:'Cijulang, Kab. Pangandaran',lat:-7.744,lon:108.506,biaya:20000,rating:4.5,suhu:30,keramaian:3,fasilitas:4,deskripsi:'Pantai dengan ombak untuk belajar selancar dan suasana yang lebih santai.'},
+ {id:12,nama:'Pantai Santolo',jenis:'Pantai',wilayah:'Pameungpeuk, Kab. Garut',lat:-7.670,lon:107.685,biaya:15000,rating:4.5,suhu:30,keramaian:3,fasilitas:3,deskripsi:'Pantai selatan Garut dengan hamparan pasir luas dan warung ikan bakar.'},
+ {id:13,nama:'Pantai Sayang Heulang',jenis:'Pantai',wilayah:'Pameungpeuk, Kab. Garut',lat:-7.650,lon:107.729,biaya:10000,rating:4.3,suhu:29,keramaian:2,fasilitas:3,deskripsi:'Pantai berpasir dengan karang di sisi tertentu, relatif sepi di hari biasa.'},
+ {id:14,nama:'Pantai Karang Hawu',jenis:'Pantai',wilayah:'Cisolok, Kab. Sukabumi',lat:-7.005,lon:106.533,biaya:25000,rating:4.2,suhu:29,keramaian:3,fasilitas:3,deskripsi:'Pantai dengan tebing karang yang dikenal lewat legenda lokal.'},
+ {id:15,nama:'Pantai Citepus',jenis:'Pantai',wilayah:'Pelabuhan Ratu, Kab. Sukabumi',lat:-6.983,lon:106.540,biaya:10000,rating:4.1,suhu:29,keramaian:4,fasilitas:4,deskripsi:'Pantai dekat pusat Pelabuhan Ratu dengan banyak warung dan penginapan.'},
+ {id:16,nama:'Pantai Ujung Genteng',jenis:'Pantai',wilayah:'Ciracap, Kab. Sukabumi',lat:-7.350,lon:106.400,biaya:30000,rating:4.6,suhu:30,keramaian:2,fasilitas:3,deskripsi:'Pantai di ujung selatan Sukabumi yang jauh dari kota, dikenal dengan penangkaran penyu.'},
+ {id:17,nama:'Tahura Ir. H. Djuanda',jenis:'Taman & Keluarga',wilayah:'Dago Pakar, Kota Bandung',lat:-6.855,lon:107.631,biaya:15000,rating:4.5,suhu:22,keramaian:4,fasilitas:4,deskripsi:'Hutan kota di utara Bandung dengan jalur jalan kaki dan gua peninggalan masa lalu.'},
+ {id:18,nama:'Floating Market Lembang',jenis:'Taman & Keluarga',wilayah:'Lembang, Kab. Bandung Barat',lat:-6.819,lon:107.618,biaya:25000,rating:4.3,suhu:21,keramaian:5,fasilitas:5,deskripsi:'Pasar terapung di atas danau buatan dengan kuliner dan wahana keluarga.'},
+ {id:19,nama:'Dusun Bambu',jenis:'Taman & Keluarga',wilayah:'Cisarua, Kab. Bandung Barat',lat:-6.799,lon:107.529,biaya:35000,rating:4.5,suhu:20,keramaian:4,fasilitas:5,deskripsi:'Kawasan wisata dengan restoran bernuansa bambu, taman, dan area bermain.'},
+ {id:20,nama:'Kebun Raya Bogor',jenis:'Taman & Keluarga',wilayah:'Kota Bogor',lat:-6.598,lon:106.800,biaya:30000,rating:4.5,suhu:27,keramaian:5,fasilitas:5,deskripsi:'Kebun raya tua di tengah kota dengan koleksi pohon besar dan taman yang luas.'},
+ {id:21,nama:'Taman Safari Indonesia',jenis:'Taman & Keluarga',wilayah:'Cisarua, Kab. Bogor',lat:-6.704,lon:106.950,biaya:200000,rating:4.5,suhu:22,keramaian:5,fasilitas:5,deskripsi:'Taman safari berkendara dengan satwa dari berbagai benua dan pertunjukan satwa.'},
+ {id:22,nama:'Situs Gunung Padang',jenis:'Budaya & Sejarah',wilayah:'Karyamukti, Kab. Cianjur',lat:-6.994,lon:107.056,biaya:10000,rating:4.5,suhu:24,keramaian:2,fasilitas:2,deskripsi:'Situs megalitik berundak di atas bukit dengan pemandangan perbukitan sekitar.'},
+ {id:23,nama:'Keraton Kasepuhan Cirebon',jenis:'Budaya & Sejarah',wilayah:'Kota Cirebon',lat:-6.726,lon:108.567,biaya:15000,rating:4.3,suhu:29,keramaian:3,fasilitas:3,deskripsi:'Keraton tertua di Cirebon dengan museum benda pusaka dan kereta kencana.'},
+ {id:24,nama:'Kampung Naga',jenis:'Budaya & Sejarah',wilayah:'Salawu, Kab. Tasikmalaya',lat:-7.362,lon:108.095,biaya:10000,rating:4.4,suhu:25,keramaian:2,fasilitas:2,deskripsi:'Kampung adat Sunda di lembah dengan rumah tradisional dan sawah berundak.'},
+ {id:25,nama:'Gedung Sate',jenis:'Budaya & Sejarah',wilayah:'Kota Bandung',lat:-6.903,lon:107.619,biaya:5000,rating:4.4,suhu:24,keramaian:4,fasilitas:4,deskripsi:'Gedung bersejarah ikon Kota Bandung dengan museum dan taman di sekitarnya.'}
+];
+
+const KOTA = [
+ {nama:'Bandung',lat:-6.9175,lon:107.6191},{nama:'Bogor',lat:-6.5950,lon:106.8166},{nama:'Depok',lat:-6.4025,lon:106.7942},
+ {nama:'Bekasi',lat:-6.2383,lon:106.9756},{nama:'Cirebon',lat:-6.7063,lon:108.5570},{nama:'Sukabumi',lat:-6.9277,lon:106.9300},
+ {nama:'Tasikmalaya',lat:-7.3274,lon:108.2207},{nama:'Garut',lat:-7.2279,lon:107.9087},{nama:'Cimahi',lat:-6.8841,lon:107.5413},
+ {nama:'Karawang',lat:-6.3227,lon:107.3376},{nama:'Cianjur',lat:-6.8205,lon:107.1428},{nama:'Purwakarta',lat:-6.5569,lon:107.4431},
+ {nama:'Subang',lat:-6.5714,lon:107.7606},{nama:'Sumedang',lat:-6.8595,lon:107.9239},{nama:'Jakarta (dari luar Jabar)',lat:-6.2088,lon:106.8456}
+];
+
+// k = kunci, tipe: cost (kecil lebih baik), benefit (besar lebih baik), target (selisih dari target diperlakukan sebagai cost)
+const KRITERIA = [
+ {k:'biaya',nama:'Harga murah',tipe:'cost'},
+ {k:'rating',nama:'Rating tinggi',tipe:'benefit'},
+ {k:'jarak',nama:'Jarak',tipe:'target'},
+ {k:'suhu',nama:'Suasana (suhu)',tipe:'target'},
+ {k:'keramaian',nama:'Keramaian',tipe:'target'},
+ {k:'fasilitas',nama:'Fasilitas',tipe:'target'}
+];
+
+function haversine(lat1,lon1,lat2,lon2){
+  const R=6371, rad=x=>x*Math.PI/180;
+  const dLat=rad(lat2-lat1), dLon=rad(lon2-lon1);
+  const a=Math.sin(dLat/2)**2+Math.cos(rad(lat1))*Math.cos(rad(lat2))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+const nz=(a,b)=>b===0?0:a/b;
+
+// prefs: {jenis:[], asal, maxBiaya|null, target:{jarak,suhu,keramaian,fasilitas}, penting:{biaya,rating,jarak,suhu,keramaian,fasilitas}, v}
+function hitungRekomendasi(p){
+  const asal=KOTA.find(k=>k.nama===p.asal)||KOTA[0];
+  const kand=DESTINASI.map(d=>({d,jarak:haversine(asal.lat,asal.lon,d.lat,d.lon)}))
+    .filter(c=>(!p.jenis.length||p.jenis.includes(c.d.jenis))&&(p.maxBiaya==null||c.d.biaya<=p.maxBiaya));
+  const pts=KRITERIA.map(c=>p.penting[c.k]);
+  const total=pts.reduce((a,b)=>a+b,0);
+  const out={asal,jumlahSemua:DESTINASI.length,jumlah:kand.length,pts,p};
+  if(total===0){out.error='bobot';return out;}
+  if(kand.length===0){out.error='kosong';return out;}
+  const w=pts.map(x=>x/total), n=KRITERIA.length, m=kand.length;
+  const X=kand.map(c=>[c.d.biaya,c.d.rating,Math.abs(c.jarak-p.target.jarak),Math.abs(c.d.suhu-p.target.suhu),Math.abs(c.d.keramaian-p.target.keramaian),Math.abs(c.d.fasilitas-p.target.fasilitas)]);
+  const best=[],worst=[];
+  for(let j=0;j<n;j++){
+    const col=X.map(r=>r[j]);
+    if(KRITERIA[j].tipe==='benefit'){best.push(Math.max(...col));worst.push(Math.min(...col));}
+    else{best.push(Math.min(...col));worst.push(Math.max(...col));}
+  }
+  const gaps=X.map(r=>r.map((x,j)=>nz(best[j]-x,best[j]-worst[j])));
+  const S=gaps.map(g=>g.reduce((a,d,j)=>a+w[j]*d,0));
+  const R=gaps.map(g=>Math.max(...g.map((d,j)=>w[j]*d)));
+  const Ss=Math.min(...S),Sm=Math.max(...S),Rs=Math.min(...R),Rm=Math.max(...R);
+  const v=p.v;
+  const Q=S.map((s,i)=>m===1?0:v*nz(s-Ss,Sm-Ss)+(1-v)*nz(R[i]-Rs,Rm-Rs));
+  const order=[...Q.keys()].sort((a,b)=>Q[a]-Q[b]||S[a]-S[b]||kand[b].d.rating-kand[a].d.rating);
+  const a1=order[0],a2=order[1];
+  const DQ=m>1?1/(m-1):Infinity, eps=1e-9;
+  const c1=m>1?(Q[a2]-Q[a1]>=DQ-eps):true;
+  const c2=S[a1]<=Ss+eps||R[a1]<=Rs+eps;
+  let kompromi,mode;
+  if(m===1||(c1&&c2)){kompromi=[a1];mode='tunggal';}
+  else if(!c1){kompromi=order.filter(i=>Q[i]-Q[a1]<DQ-eps);mode='setara';}
+  else{kompromi=[a1,a2];mode='stabil';}
+  const rows=order.map((i,idx)=>({
+    c:kand[i],d:kand[i].d,jarak:kand[i].jarak,x:X[i],gaps:gaps[i],S:S[i],R:R[i],Q:Q[i],
+    rank:idx+1,skor:(1-Q[i])*100,utama:kompromi.includes(i)
+  }));
+  Object.assign(out,{w,best,worst,Ss,Sm,Rs,Rm,DQ,c1,c2,mode,rows,m,selisihQ:m>1?Q[a2]-Q[a1]:0});
+  return out;
+}
+// ============ </core> ============
+
+// ============ TAMPILAN ============
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const rp=n=>'Rp'+String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const dec=(n,f=1)=>n.toFixed(f).replace('.',',');
+const BUD_MAX=250000;
+const LBL_RAMAI=['','sangat sepi','sepi','sedang','ramai','sangat ramai'];
+const LBL_FAS=['','sangat sederhana','sederhana','cukup','lengkap','sangat lengkap'];
+
+const IC={
+ pin:'<circle cx="12" cy="10" r="2.6"/><path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/>',
+ thermo:'<path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/>',
+ people:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.9.2 5 2.4 5 5.3"/>',
+ build:'<path d="M4 21V8l8-4 8 4v13"/><path d="M9 21v-6h6v6"/>',
+ coin:'<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"/>',
+ check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+ cross:'<path d="M6 6l12 12M18 6L6 18"/>'
+};
+const ico=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
+const star='<svg class="ic fill star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/></svg>';
+
+// ilustrasi dekoratif per jenis
+function art(d,pfx){
+  const id=pfx+d.id, s=d.id;
+  const head=`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">`;
+  const wave=(y,c,o)=>`<path d="M0 ${y} Q20 ${y-8} 40 ${y} T80 ${y} T120 ${y} T160 ${y} T200 ${y} T240 ${y} T280 ${y} T320 ${y} V${y+60} H0Z" fill="${c}" opacity="${o}"/>`;
+  switch(d.jenis){
+    case 'Pantai':
+      return head+`<defs><linearGradient id="a${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FD8EA"/><stop offset="1" stop-color="#FCE9C9"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#a${id})"/><circle cx="${60+(s*43)%200}" cy="46" r="16" fill="#FFF3C9"/>
+      <rect y="94" width="320" height="60" fill="#2C86A8"/>${wave(104,'#4AA3C2',.75)}${wave(124,'#1F6C8C',.6)}
+      <path d="M0 142 Q40 132 80 142 T160 140 T240 142 T320 138 V180 H0Z" fill="#EBD3A1"/></svg>`;
+    case 'Pegunungan':{
+      const t=(s%5)*6-12;
+      return head+`<defs><linearGradient id="a${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFD9E2"/><stop offset="1" stop-color="#F4EFDC"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#a${id})"/><circle cx="${250-(s*17)%90}" cy="40" r="13" fill="#FFF3C9" opacity=".9"/>
+      <g transform="translate(${t} 0)"><polygon points="-20,120 50,70 90,105 140,55 200,110 250,75 340,115 340,180 -20,180" fill="#7FA596"/>
+      <polygon points="-20,140 60,95 110,130 170,85 230,128 290,100 340,125 340,180 -20,180" fill="#4F8271"/>
+      <polygon points="-20,165 70,128 130,155 200,120 270,150 340,135 340,180 -20,180" fill="#2E5B4C"/></g>
+      <rect y="112" width="320" height="26" fill="#fff" opacity=".18"/></svg>`;}
+    case 'Air & Danau':
+      return head+`<defs><linearGradient id="a${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CDE9E4"/><stop offset="1" stop-color="#EAF5EC"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#a${id})"/>
+      <path d="M0 110 Q60 70 120 96 T240 84 T320 100 V180 H0Z" fill="#5C9A72"/>
+      <polygon points="${110+(s%4)*6},60 215,60 235,150 90,150" fill="#3F7A5A"/>
+      <rect x="${150+(s%3)*4}" y="64" width="22" height="84" fill="#F4FBFD" opacity=".92"/><rect x="${156+(s%3)*4}" y="64" width="3" height="84" fill="#BFE3EC" opacity=".8"/>
+      <ellipse cx="${161+(s%3)*4}" cy="150" rx="74" ry="14" fill="#5BB6C9"/><path d="M0 160 Q80 146 160 160 T320 156 V180 H0Z" fill="#2F6B4A"/></svg>`;
+    case 'Taman & Keluarga':{
+      let trees='';
+      for(let i=0;i<5;i++){const x=24+i*64+((s*13+i*7)%22), r=16+((s+i*3)%3)*4;
+        trees+=`<rect x="${x-2}" y="${112+(i%2)*8}" width="4" height="26" fill="#5B4632"/><circle cx="${x}" cy="${108+(i%2)*8}" r="${r}" fill="${i%2?'#2F6B3E':'#3E8048'}"/>`;}
+      return head+`<defs><linearGradient id="a${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D6EBC7"/><stop offset="1" stop-color="#F2F7DD"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#a${id})"/><circle cx="${230-(s*19)%120}" cy="38" r="14" fill="#FFF3C9"/>
+      <path d="M0 120 Q80 90 160 112 T320 104 V180 H0Z" fill="#86BA72"/>${trees}
+      <path d="M0 150 Q120 134 200 148 T320 150 V180 H0Z" fill="#5E9B5C"/><path d="M120 180 Q150 150 210 140 L230 140 Q170 156 160 180Z" fill="#E8D9AE"/></svg>`;}
+    default:
+      return head+`<defs><linearGradient id="a${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6D3A0"/><stop offset="1" stop-color="#F0A56E"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#a${id})"/><circle cx="${70+(s*29)%180}" cy="132" r="26" fill="#FFE7B0" opacity=".9"/>
+      <g fill="#4A3330"><rect x="108" y="118" width="104" height="44"/><polygon points="98,120 160,92 222,120"/><polygon points="120,98 160,72 200,98"/><polygon points="140,78 160,54 180,78"/><rect x="158" y="40" width="4" height="16"/></g>
+      <rect y="158" width="320" height="22" fill="#6B4B35"/></svg>`;
+  }
+}
+function heroArt(){
+  return `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs><linearGradient id="hs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ED6E8"/><stop offset="1" stop-color="#FBE6C2"/></linearGradient></defs>
+  <rect width="400" height="300" fill="url(#hs)"/><circle cx="300" cy="70" r="26" fill="#FFF0BE"/>
+  <polygon points="-10,190 70,110 130,170 190,90 260,175 330,120 410,180 410,300 -10,300" fill="#7FA596"/>
+  <polygon points="-10,220 90,150 160,205 240,140 330,210 410,170 410,300 -10,300" fill="#4F8271"/>
+  <g fill="none" stroke="#3E8048" stroke-width="5" opacity=".55"><path d="M-10 250 Q100 225 200 245 T410 235"/><path d="M-10 266 Q100 241 200 261 T410 251"/><path d="M-10 282 Q100 257 200 277 T410 267"/></g>
+  <path d="M-10 250 Q100 225 200 245 T410 235 V300 H-10Z" fill="#2E5B4C" opacity=".85"/>
+  <path d="M-10 270 Q100 250 200 268 T410 258 V300 H-10Z" fill="#244A3E"/></svg>`;
+}
+
+// ----- kartu -----
+function kartu(d){
+  return `<div class="card" role="button" tabindex="0" data-id="${d.id}" aria-label="Lihat detail ${d.nama}">
+    <div class="art">${art(d,'k')}<span class="tag">${d.jenis}</span></div>
+    <div class="card-b"><h3>${d.nama}</h3><p class="muted" style="font-size:13.5px">${d.wilayah}</p>
+    <ul class="meta"><li>${star}<span class="num">${dec(d.rating)}</span></li><li>${ico('coin')}<span class="num">${rp(d.biaya)}</span></li><li>${ico('thermo')}<span class="num">${d.suhu}°C</span></li></ul></div></div>`;
+}
+function bindKartu(root){
+  $$('.card[data-id]',root).forEach(el=>{
+    const open=()=>bukaDetail(+el.dataset.id,el);
+    el.addEventListener('click',open);
+    el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
+  });
+}
+
+// ----- navigasi -----
+let halaman='beranda';
+function go(p){
+  halaman=p;
+  $$('main > section').forEach(s=>{s.hidden=(s.id!=='page-'+p);});
+  $$('.nav li button').forEach(b=>{if(b.dataset.go===p||(p==='hasil'&&b.dataset.go==='rekomendasi'))b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+  try{window.scrollTo(0,0);}catch(e){}
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-go]'); if(!b)return;
+  go(b.dataset.go);
+});
+
+// ----- beranda -----
+function renderBeranda(){
+  $('#hero-art').innerHTML=heroArt();
+  $('#f-n').textContent=DESTINASI.length;
+  $('#cat-grid').innerHTML=JENIS.map(j=>{
+    const ds=DESTINASI.filter(d=>d.jenis===j);
+    return `<button class="cat-card" data-kat="${j}"><div class="art">${art(ds[0],'c')}</div><div class="cb"><strong>${j}</strong><span class="muted num">${ds.length} destinasi</span></div></button>`;
+  }).join('');
+  $$('#cat-grid [data-kat]').forEach(b=>b.addEventListener('click',()=>{katAktif=b.dataset.kat;renderKatalog();go('katalog');}));
+  const top=[...DESTINASI].sort((a,b)=>b.rating-a.rating||a.id-b.id).slice(0,4);
+  $('#featured').innerHTML=top.map(kartu).join('');
+  bindKartu($('#featured'));
+}
+
+// ----- katalog -----
+let katAktif='Semua';
+function renderKatalog(){
+  $('#tabs').innerHTML=['Semua',...JENIS].map(j=>`<button type="button" data-t="${j}" aria-pressed="${j===katAktif}">${j}</button>`).join('');
+  $$('#tabs button').forEach(b=>b.addEventListener('click',()=>{katAktif=b.dataset.t;renderKatalog();}));
+  const ds=DESTINASI.filter(d=>katAktif==='Semua'||d.jenis===katAktif);
+  $('#katalog-grid').innerHTML=ds.map(kartu).join('');
+  bindKartu($('#katalog-grid'));
+}
+
+// ----- detail (modal) -----
+let fokusAsal=null;
+function dots(n){return `<span class="dots" aria-hidden="true">${[1,2,3,4,5].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span>`;}
+function bukaDetail(id,from,jarak){
+  const d=DESTINASI.find(x=>x.id===id); if(!d)return;
+  fokusAsal=from||null;
+  const asal=KOTA.find(k=>k.nama===$('#f-asal').value)||KOTA[0];
+  const jr=jarak!=null?jarak:haversine(asal.lat,asal.lon,d.lat,d.lon);
+  $('#m-content').innerHTML=`<div class="art">${art(d,'m')}<span class="tag">${d.jenis}</span></div>
+  <div class="modal-body"><h2 id="m-title">${d.nama}</h2><p class="muted">${d.wilayah}</p><p>${d.deskripsi}</p>
+  <div class="attrs">
+   <div class="attr"><small>Rating</small><strong class="num">${dec(d.rating)} / 5</strong></div>
+   <div class="attr"><small>Perkiraan biaya per orang</small><strong class="num">${rp(d.biaya)}</strong></div>
+   <div class="attr"><small>Suhu rata-rata</small><strong class="num">${d.suhu}°C</strong></div>
+   <div class="attr"><small>Jarak garis lurus dari ${asal.nama.split(' (')[0]}</small><strong class="num">${Math.round(jr)} km</strong></div>
+   <div class="attr"><small>Keramaian</small><strong>${LBL_RAMAI[d.keramaian]}</strong>${dots(d.keramaian)}</div>
+   <div class="attr"><small>Fasilitas</small><strong>${LBL_FAS[d.fasilitas]}</strong>${dots(d.fasilitas)}</div>
+  </div><p class="muted" style="font-size:12.5px">Data contoh untuk prototipe, belum diverifikasi.</p></div>`;
+  $('#modal').hidden=false;
+  $('#m-close').focus();
+}
+function tutupDetail(){
+  $('#modal').hidden=true;
+  if(fokusAsal&&document.contains(fokusAsal)){try{fokusAsal.focus();}catch(e){}}
+}
+$('#m-close').addEventListener('click',tutupDetail);
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')tutupDetail();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#modal').hidden)tutupDetail();});
+
+// ----- form -----
+const PENTING=[['0','Abaikan'],['1','Biasa'],['2','Penting'],['3','Sangat penting']];
+function initForm(){
+  $('#chips-jenis').innerHTML=JENIS.map(j=>`<label><input type="checkbox" value="${j}" checked><span>${j}</span></label>`).join('');
+  $('#f-asal').innerHTML=KOTA.map(k=>`<option${k.nama==='Bandung'?' selected':''}>${k.nama}</option>`).join('');
+  ['jarak','suhu','ramai','fas','biaya','rating'].forEach(k=>{
+    $('#p-'+k).innerHTML=PENTING.map(([v,t])=>`<option value="${v}"${v==='1'?' selected':''}>${t}</option>`).join('');
+  });
+  $('#presets').innerHTML=PRESETS.map((p,i)=>`<button type="button" class="chip-btn" data-p="${i}">${p.nama}</button>`).join('');
+  $$('#presets button').forEach(b=>b.addEventListener('click',()=>terapkanPreset(PRESETS[+b.dataset.p])));
+  $('#form').addEventListener('input',updateReadouts);
+  $('#form').addEventListener('submit',e=>{e.preventDefault();cari();});
+  $('#btn-reset').addEventListener('click',()=>{resetForm();});
+  updateReadouts();
+}
+function labelSuhu(t){return t<=20?'sejuk':t<=25?'nyaman':'hangat';}
+function updateReadouts(){
+  const b=+$('#f-biaya').value;
+  $('#o-biaya').textContent=b>=BUD_MAX?'tanpa batas':rp(b);
+  const j=+$('#f-jarak').value;
+  $('#o-jarak').textContent=j===0?'sedekat mungkin':'sekitar '+j+' km';
+  const t=+$('#f-suhu').value;
+  $('#o-suhu').textContent='sekitar '+t+'°C, '+labelSuhu(t);
+  $('#o-ramai').textContent=LBL_RAMAI[+$('#f-ramai').value];
+  $('#o-fas').textContent=LBL_FAS[+$('#f-fas').value];
+}
+function setVal(id,v){$('#'+id).value=String(v);}
+function resetForm(){
+  $$('#chips-jenis input').forEach(i=>i.checked=true);
+  setVal('f-asal','Bandung');setVal('f-biaya',50000);setVal('f-jarak',60);setVal('f-suhu',20);setVal('f-ramai',2);setVal('f-fas',3);
+  ['jarak','suhu','ramai','fas','biaya','rating'].forEach(k=>setVal('p-'+k,1));
+  $$('input[name=gaya]').forEach(r=>r.checked=(r.value==='0.5'));
+  $('#form-msg').textContent='';
+  updateReadouts();
+}
+const PRESETS=[
+ {nama:'Anak kos hemat',jenis:[],biaya:25000,jarak:0,suhu:22,ramai:2,fas:3,pen:{jarak:2,suhu:0,ramai:0,fas:1,biaya:3,rating:1}},
+ {nama:'Mencari udara sejuk',jenis:[],biaya:50000,jarak:60,suhu:17,ramai:2,fas:3,pen:{jarak:1,suhu:3,ramai:2,fas:1,biaya:1,rating:1}},
+ {nama:'Liburan pantai santai',jenis:['Pantai'],biaya:30000,jarak:150,suhu:30,ramai:2,fas:3,pen:{jarak:0,suhu:1,ramai:3,fas:1,biaya:2,rating:2}},
+ {nama:'Wisata keluarga',jenis:['Taman & Keluarga','Air & Danau'],biaya:BUD_MAX,jarak:40,suhu:22,ramai:3,fas:5,pen:{jarak:2,suhu:1,ramai:1,fas:3,biaya:0,rating:2}}
+];
+function terapkanPreset(p){
+  resetForm();
+  $$('#chips-jenis input').forEach(i=>i.checked=!p.jenis.length||p.jenis.includes(i.value));
+  setVal('f-biaya',p.biaya);setVal('f-jarak',p.jarak);setVal('f-suhu',p.suhu);setVal('f-ramai',p.ramai);setVal('f-fas',p.fas);
+  Object.entries({jarak:'jarak',suhu:'suhu',ramai:'ramai',fas:'fas',biaya:'biaya',rating:'rating'}).forEach(([k,id])=>setVal('p-'+id,p.pen[k]));
+  updateReadouts();
+  $('#form-msg').textContent='Contoh "'+p.nama+'" terisi. Ubah sesukamu, lalu tekan Cari rekomendasi.';
+}
+function bacaPrefs(){
+  const bud=+$('#f-biaya').value;
+  return {
+    jenis:$$('#chips-jenis input:checked').map(i=>i.value),
+    asal:$('#f-asal').value,
+    maxBiaya:bud>=BUD_MAX?null:bud,
+    target:{jarak:+$('#f-jarak').value,suhu:+$('#f-suhu').value,keramaian:+$('#f-ramai').value,fasilitas:+$('#f-fas').value},
+    penting:{biaya:+$('#p-biaya').value,rating:+$('#p-rating').value,jarak:+$('#p-jarak').value,suhu:+$('#p-suhu').value,keramaian:+$('#p-ramai').value,fasilitas:+$('#p-fas').value},
+    v:+($('input[name=gaya]:checked').value)
+  };
+}
+function cari(){
+  const p=bacaPrefs();
+  const hasil=hitungRekomendasi(p);
+  $('#form-msg').textContent='';
+  renderHasil(hasil);
+  go('hasil');
+}
+
+// ----- hasil -----
+function alasan(r,H){
+  const out=[];
+  KRITERIA.forEach((kr,j)=>{
+    if(H.pts[j]===0)return;
+    const g=r.gaps[j], d=r.d;
+    let ok=g<=0.25, bad=g>=0.75;
+    if(!ok&&!bad)return;
+    let t='';
+    switch(kr.k){
+      case 'biaya':t=`Biaya ${rp(d.biaya)} ${ok?'terjangkau':'cukup mahal'}`;break;
+      case 'rating':t=`Rating ${dec(d.rating)} ${ok?'tinggi':'lebih rendah'}`;break;
+      case 'jarak':t=`Jarak ${Math.round(r.jarak)} km ${ok?'sesuai keinginan':'kurang sesuai'}`;break;
+      case 'suhu':t=`Suhu sekitar ${d.suhu}°C ${ok?'sesuai':'kurang sesuai'}`;break;
+      case 'keramaian':t=`Keramaian ${LBL_RAMAI[d.keramaian]} ${ok?'sesuai':'kurang sesuai'}`;break;
+      case 'fasilitas':t=`Fasilitas ${LBL_FAS[d.fasilitas]} ${ok?'sesuai':'kurang sesuai'}`;break;
+    }
+    out.push({ok,t,w:H.w[j],g});
+  });
+  const good=out.filter(x=>x.ok).sort((a,b)=>b.w-a.w).slice(0,3);
+  const bad=out.filter(x=>!x.ok).sort((a,b)=>b.w-a.w).slice(0,2);
+  return [...good,...bad];
+}
+function kartuHasil(r,H){
+  const lbl=r.utama?(H.mode==='tunggal'?'Pilihan terbaik':'Pilihan setara'):'';
+  const al=alasan(r,H);
+  return `<div class="card res-card" role="button" tabindex="0" data-id="${r.d.id}" data-jarak="${r.jarak}" aria-label="Lihat detail ${r.d.nama}">
+   <div class="art">${art(r.d,'h')}<span class="tag">${r.d.jenis}</span><span class="rank" aria-label="Peringkat ${r.rank}">${r.rank}</span></div>
+   <div class="card-b">${lbl?`<span class="badge">${lbl}</span>`:''}<h3>${r.d.nama}</h3><p class="muted" style="font-size:13.5px">${r.d.wilayah}</p>
+    <ul class="meta"><li>${ico('pin')}<span class="num">${Math.round(r.jarak)} km</span></li><li>${ico('coin')}<span class="num">${rp(r.d.biaya)}</span></li><li>${ico('thermo')}<span class="num">${r.d.suhu}°C</span></li><li>${star}<span class="num">${dec(r.d.rating)}</span></li></ul>
+    <ul class="why">${al.length?al.map(a=>`<li class="${a.ok?'ok':'no'}">${ico(a.ok?'check':'cross')}<span style="color:var(--ink)">${a.t}</span></li>`).join(''):'<li class="muted">Nilainya berada di tengah untuk faktor yang kamu pilih.</li>'}</ul>
+    <div class="score"><span>Skor relatif</span><i><b style="width:${Math.max(2,r.skor).toFixed(0)}%"></b></i><span class="num">${r.skor.toFixed(0)}%</span></div>
+   </div></div>`;
+}
+function barisHasil(r){
+  return `<button class="row" type="button" data-id="${r.d.id}" data-jarak="${r.jarak}"><span class="r num">${r.rank}</span>
+   <span class="n"><strong>${r.d.nama}</strong><span class="muted" style="font-size:13px">${r.d.jenis}, ${r.d.wilayah}</span></span>
+   <span class="score"><span class="sr">Skor relatif</span><i><b style="width:${Math.max(2,r.skor).toFixed(0)}%"></b></i><span class="num">${r.skor.toFixed(0)}%</span></span></button>`;
+}
+function fmtNilai(j,x){
+  switch(KRITERIA[j].k){
+    case 'biaya':return rp(x);
+    case 'rating':return dec(x);
+    case 'jarak':return Math.round(x)+' km';
+    case 'suhu':return dec(x,0)+' °C';
+    default:return dec(x,0);
+  }
+}
+function ringkasan(H){
+  const p=H.p;
+  const pills=[
+    p.jenis.length&&p.jenis.length<JENIS.length?'Jenis: '+p.jenis.join(', '):'Semua jenis wisata',
+    'Dari '+H.asal.nama.split(' (')[0],
+    p.maxBiaya==null?'Tanpa batas anggaran':'Maks '+rp(p.maxBiaya),
+    'Jarak ~'+p.target.jarak+' km','Suhu ~'+p.target.suhu+'°C','Keramaian '+LBL_RAMAI[p.target.keramaian],'Fasilitas '+LBL_FAS[p.target.fasilitas],
+    'Gaya: '+(p.v===0.5?'seimbang':p.v<0.5?'hindari kekurangan besar':'unggul di banyak hal')
+  ];
+  const tot=H.pts.reduce((a,b)=>a+b,0);
+  const bars=KRITERIA.map((k,j)=>`<div class="wbar"><span>${k.nama}</span><i><b style="width:${(H.pts[j]/tot*100).toFixed(0)}%"></b></i><span class="num">${(H.pts[j]/tot*100).toFixed(0)}%</span></div>`).join('');
+  return `<div class="summary"><div class="panel"><h3>Preferensimu</h3><div style="margin-top:10px">${pills.map(x=>`<span class="pill">${x}</span>`).join('')}</div></div>
+   <div class="panel"><h3>Bobot tiap faktor</h3><div class="wbars" style="margin-top:12px">${bars}</div></div></div>`;
+}
+function renderHasil(H){
+  const box=$('#hasil-body');
+  const balik=`<div style="margin-top:16px"><button class="btn ghost small" data-go="rekomendasi">Ubah preferensi</button></div>`;
+  if(H.error==='bobot'){
+    box.innerHTML=`<div class="empty"><h3>Belum ada faktor yang dinilai</h3><p class="muted" style="margin-top:6px">Semua faktor diset Abaikan. Pilih minimal satu faktor yang Biasa atau lebih penting.</p>${balik}</div>`;return;
+  }
+  if(H.error==='kosong'){
+    box.innerHTML=`<div class="empty"><h3>Tidak ada destinasi yang lolos filter</h3><p class="muted" style="margin-top:6px">Coba naikkan anggaran maksimal atau pilih lebih banyak jenis wisata.</p>${balik}</div>`;return;
+  }
+  const utama=H.rows.filter(r=>r.utama), lain=H.rows.filter(r=>!r.utama);
+  const pesan={
+    tunggal:`<b>Satu pilihan unggul jelas.</b> ${utama[0].d.nama} lebih baik dari yang lain pada kedua ukuran (total kekurangan dan kekurangan terbesar), dan selisih nilainya cukup besar.`,
+    setara:`<b>${utama.length} pilihan setara.</b> Nilai kompromi destinasi teratas sangat berdekatan, jadi sistem tidak memilih satu pemenang saja. Pertimbangkan semuanya.`,
+    stabil:`<b>Dua pilihan teratas ditampilkan bersama.</b> Destinasi peringkat 1 belum unggul di kedua ukuran, jadi peringkat 2 ikut dipertimbangkan.`
+  }[H.mode];
+  const shown=lain.slice(0,8);
+  box.innerHTML=`<p class="muted" style="margin-bottom:14px"><span class="num">${H.jumlah}</span> dari <span class="num">${H.jumlahSemua}</span> destinasi lolos filter.</p>
+   ${ringkasan(H)}
+   <div class="banner" role="status">${pesan}</div>
+   <div class="grid" id="res-utama">${utama.map(r=>kartuHasil(r,H)).join('')}</div>
+   ${lain.length?`<div class="sec-head" style="margin-top:30px"><h2 style="font-size:24px">Pilihan lainnya</h2></div><div class="rows" id="res-lain">${shown.map(barisHasil).join('')}</div>
+   ${lain.length>shown.length?`<div style="margin-top:12px"><button class="btn ghost small" id="more" type="button">Tampilkan semua (${lain.length})</button></div>`:''}`:''}
+   ${tabelHitung(H)}
+   ${balik}`;
+  bindHasil(box);
+  const more=$('#more');
+  if(more)more.addEventListener('click',()=>{$('#res-lain').innerHTML=lain.map(barisHasil).join('');more.remove();bindHasil(box);});
+}
+function bindHasil(root){
+  $$('[data-id]',root).forEach(el=>{
+    if(el.dataset.bound)return; el.dataset.bound='1';
+    const open=()=>bukaDetail(+el.dataset.id,el,+el.dataset.jarak);
+    el.addEventListener('click',open);
+    el.addEventListener('keydown',e=>{if(el.tagName!=='BUTTON'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();open();}});
+  });
+}
+function tabelHitung(H){
+  const idealRows=KRITERIA.map((k,j)=>`<tr><td>${k.nama}</td><td class="r num">${(H.w[j]*100).toFixed(0)}%</td><td class="r num">${fmtNilai(j,H.best[j])}${k.tipe==='target'?' (selisih)':''}</td><td class="r num">${fmtNilai(j,H.worst[j])}${k.tipe==='target'?' (selisih)':''}</td></tr>`).join('');
+  const hit=H.rows.map(r=>`<tr><td>${r.rank}</td><td>${r.d.nama}</td><td class="r num">${dec(r.S,3)}</td><td class="r num">${dec(r.R,3)}</td><td class="r num">${dec(r.Q,3)}</td></tr>`).join('');
+  const dq=H.m>1?dec(H.DQ,3):'tidak berlaku';
+  return `<details class="calc"><summary>Lihat perhitungan VIKOR</summary>
+   <h4 style="margin:14px 0 4px;font-size:16px">Nilai terbaik dan terburuk tiap faktor</h4>
+   <div class="tbl"><table><thead><tr><th>Faktor</th><th class="r">Bobot</th><th class="r">Terbaik (f*)</th><th class="r">Terburuk (f⁻)</th></tr></thead><tbody>${idealRows}</tbody></table></div>
+   <h4 style="margin:18px 0 4px;font-size:16px">S, R, dan Q tiap destinasi (v = ${dec(H.p.v)})</h4>
+   <div class="tbl"><table><thead><tr><th>#</th><th>Destinasi</th><th class="r">S</th><th class="r">R</th><th class="r">Q</th></tr></thead><tbody>${hit}</tbody></table></div>
+   <h4 style="margin:18px 0 4px;font-size:16px">Uji dua syarat</h4>
+   <p><b>Keunggulan:</b> Q₂ − Q₁ = <span class="num">${dec(H.selisihQ,3)}</span>, batas 1/(m−1) = <span class="num">${dq}</span>. ${H.m<2?'Hanya satu kandidat.':H.c1?'Terpenuhi.':'Tidak terpenuhi.'}</p>
+   <p><b>Kestabilan:</b> peringkat 1 ${H.c2?'juga terbaik menurut S atau R. Terpenuhi.':'bukan yang terbaik menurut S maupun R. Tidak terpenuhi.'}</p></details>`;
+}
+
+// ----- mulai -----
+initForm();
+renderBeranda();
+renderKatalog();
+go('beranda');
+</script>
+
+</body></html>
