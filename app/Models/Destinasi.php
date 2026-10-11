@@ -39,4 +39,13 @@ class Destinasi extends Model
         'keramaian' => 'integer',
         'fasilitas' => 'integer',
     ];
+
+    public function getFotoUrlAttribute(): string
+    {
+        if (!empty($this->foto) && file_exists(public_path('images/destinasi/' . $this->foto))) {
+            return asset('images/destinasi/' . $this->foto);
+        }
+
+        return asset('images/placeholder.jpg');
+    }
 }
