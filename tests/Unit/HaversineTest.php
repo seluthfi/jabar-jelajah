@@ -20,6 +20,6 @@ class HaversineTest extends TestCase
 
         $jarak = Haversine::hitung($latBandung, $lonBandung, $latGarut, $lonGarut);
 
-        $this->assertEqualsWithDelta(43.0, $jarak, 3.0);
+        $this->assertEqualsWithDelta(47.04, $jarak, 0.1);
     }
 }

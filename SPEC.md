@@ -335,7 +335,7 @@ Dengan `v = 1`: urutan tetap Alfa, Delta, Gama, Beta dengan Q = 0,0000; 0,5981; 
 
 **Tes 5: error.** Bobot semua 0 melempar `InvalidArgumentException`. Data kosong melempar `InvalidArgumentException`.
 
-**Tes 6: Haversine.** Bandung (−6,9175; 107,6191) ke Garut (−7,2279; 107,9087) berjarak kira-kira 43 km (toleransi 3 km).
+**Tes 6: Haversine.** Bandung (−6,9175; 107,6191) ke Garut (−7,2279; 107,9087) berjarak kira-kira 47,04 km (toleransi 0,1 km).
 
 **`tests/Feature/RekomendasiApiTest.php`** (`RefreshDatabase`, database berisi 3 destinasi buatan di dalam tes):
 
