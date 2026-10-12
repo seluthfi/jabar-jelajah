@@ -228,13 +228,13 @@ Nilai selain 0.2 / 0.5 / 0.8 tidak dipakai di antarmuka. Desain Stitch yang mema
 
 | Kondisi | Isi panel kanan |
 |---|---|
-| 1. Awal (belum mencari) | Keadaan kosong: ikon kompas hijau, judul "Atur preferensimu, lalu tekan Tampilkan Rekomendasi", dan 3 langkah: "1. Atur jarak, suhu, keramaian, fasilitas, dan anggaran", "2. Sistem menghitung peringkat dengan metode VIKOR", "3. Lihat destinasi paling cocok beserta alasannya". Tanpa kartu destinasi dan tanpa angka skor. |
+| 1. Awal (belum mencari) | Sesuai desain `rekomendasi.html`: header "Rekomendasi Wisata untukmu" dengan badge "{N} destinasi dianalisis" (N = total baris tabel destinasi), "Ringkasan Preferensi Aktif" (dengan label "Jarak Diinginkan"), "Prioritas Penilaian" (bar bobot kriteria yang reaktif saat slider/bobot diubah, persen = nilai penting / total penting), "Destinasi Populer Siap Dikalkulasi" (grid 2x2 dari 4 destinasi rating tertinggi di database dengan badge "{N} Titik Aktif"), "Bagaimana Rekomendasi Dihitung?" (3 langkah VIKOR), "Insight Perjalanan", dan "Jaminan Rekomendasi Objektif & Bebas Bias". Tanpa angka karangan atau data rekaan. |
 | 2. Memuat | Kerangka kartu abu-abu berkedip (skeleton) dan teks "Menghitung...". Tombol dinonaktifkan. |
 | 3. Hasil | Daftar peringkat (lihat 6.4) |
 | 4. Tidak ada hasil | "Tidak ada destinasi yang cocok", saran: naikkan anggaran maksimal atau tambah jenis wisata. Dipakai juga untuk `mode: "kosong"`. |
 | 5. Error | Pesan kesalahan jelas: kesalahan validasi (422) menampilkan pesan per kolom; server tidak terjangkau menampilkan "Tidak dapat menghubungi server, coba lagi". |
 
-Saat halaman dibuka, tampilkan kondisi 1. **Jangan memuat data contoh atau hasil apa pun sebelum tombol ditekan.**
+Saat halaman dibuka, tampilkan kondisi 1. Data destinasi populer diambil dari database (rating tertinggi), sedangkan perhitungan peringkat dan skor kompromi VIKOR baru dihitung setelah tombol ditekan.
 
 ### 6.4 Kondisi hasil
 

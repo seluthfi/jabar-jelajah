@@ -84,17 +84,22 @@ class HalamanTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_halaman_rekomendasi_mengembalikan_status_200_dan_tidak_memuat_kartu_sebelum_pencarian(): void
+    public function test_halaman_rekomendasi_mengembalikan_status_200_dan_tidak_memuat_skor_sebelum_pencarian(): void
     {
         $response = $this->get('/rekomendasi');
 
         $response->assertStatus(200);
         $response->assertSee('Cari Rekomendasi');
-        $response->assertSee('Atur preferensimu, lalu tekan Tampilkan Rekomendasi');
-        $response->assertSee('Sistem menghitung peringkat dengan metode VIKOR');
-        // Pastikan kartu destinasi belum dimuat sebelum pencarian
-        $response->assertDontSee('Kawah Putih Ciwidey');
+        $response->assertSee('Rekomendasi Wisata untukmu');
+        $response->assertSee('Ringkasan Preferensi Aktif');
+        $response->assertSee('Prioritas Penilaian');
+        $response->assertSee('Destinasi Populer Siap Dikalkulasi');
+        // Kartu destinasi populer boleh ada di database
+        $response->assertSee('Kawah Putih Ciwidey');
+        // Pastikan peringkat hasil rekomendasi, nilai Q, dan persen kecocokan belum ada sebelum pencarian
         $response->assertDontSee('#1 Terbaik');
+        $response->assertDontSee('Q = 0.');
+        $response->assertDontSee('100.0%');
     }
 }
 
