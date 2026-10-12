@@ -2,6 +2,17 @@
 
 @php
     $populer = \App\Models\Destinasi::orderByDesc('rating')->take(4)->get();
+    $totalDestinasi = \App\Models\Destinasi::count();
+    $sejukCount = \App\Models\Destinasi::where('suhu', '<=', 20)->count();
+    $pctSejuk = $totalDestinasi > 0 ? round(($sejukCount / $totalDestinasi) * 100) : 0;
+    $terjangkauCount = \App\Models\Destinasi::where('biaya', '<=', 30000)->count();
+    $pctTerjangkau = $totalDestinasi > 0 ? round(($terjangkauCount / $totalDestinasi) * 100) : 0;
+    $ratingTinggiCount = \App\Models\Destinasi::where('rating', '>=', 4.5)->count();
+    $pctRatingTinggi = $totalDestinasi > 0 ? round(($ratingTinggiCount / $totalDestinasi) * 100) : 0;
+    $totalKabupatenKota = \App\Models\Destinasi::select('wilayah')->get()->map(function($d) {
+        $parts = explode(',', $d->wilayah);
+        return trim(end($parts));
+    })->unique()->count();
 @endphp
 
 @section('content')
@@ -34,7 +45,7 @@
     <!-- Two-Column Main Workbench -->
     <section class="max-w-[1280px] w-full mx-auto px-6 lg:px-12 pb-20">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-            <!-- SISI KIRI - Form Preferensi (5 of 12 cols, h-full, sejajar) -->
+            <!-- SISI KIRI - Form Preferensi (~40% desktop: 5 of 12 cols, h-full, tidak sticky) -->
             <div class="lg:col-span-5 flex flex-col h-full">
                 <div id="panel-kiri-card" class="bg-surface-container-lowest rounded-2xl p-6 lg:p-7 shadow-[0_4px_24px_rgba(46,125,91,0.06)] border border-surface-variant/60 flex flex-col h-full">
                     <!-- Form Header -->
@@ -75,7 +86,7 @@
                                 </div>
                             </div>
 
-                            <!-- (b) Pilihan Kategori / Jenis Wisata (5 nilai SPEC, default tidak ada yang dipilih) -->
+                            <!-- (b) Pilihan Kategori / Jenis Wisata (5 nilai SPEC, default kosong = semua jenis) -->
                             <div class="space-y-2.5">
                                 <div class="flex items-center justify-between">
                                     <label class="block font-label-lg text-label-lg text-on-surface flex items-center gap-2">
@@ -103,7 +114,7 @@
                                 </div>
                             </div>
 
-                            <!-- Kriteria Slider & Tingkat Kepentingan (Urutan desain) -->
+                            <!-- Kriteria Slider & Tingkat Kepentingan (Urutan desain persis) -->
                             <div class="pt-1 space-y-4">
                                 <div class="flex items-center justify-between pb-1">
                                     <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold">Kriteria &amp; Pembobotan (0 - 3)</span>
@@ -261,7 +272,7 @@
                             </div>
                         </div>
 
-                        <!-- (j) Tombol Utama & Footer Kiri (mt-auto agar sejajar dengan panel kanan) -->
+                        <!-- (j) Tombol Utama & Footer Kiri (mt-auto) -->
                         <div class="mt-auto pt-6 space-y-2">
                             <button id="btn-submit" class="w-full py-4 px-6 rounded-xl bg-secondary-container hover:bg-secondary text-on-secondary-container hover:text-on-secondary font-headline-sm text-headline-sm transition-all duration-200 flex items-center justify-center gap-3 shadow-[0_8px_20px_rgba(242,155,56,0.25)] active:scale-[0.99] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed" type="submit">
                                 <span class="material-symbols-outlined text-[24px]">explore</span>
@@ -273,483 +284,556 @@
                 </div>
             </div>
 
-            <!-- SISI KANAN - Panel Hasil / Panduan (7 of 12 cols, h-full, sejajar) -->
-            <div class="lg:col-span-7 flex flex-col h-full">
-                <div id="panel-kanan-card" class="bg-surface-container-lowest rounded-2xl border border-surface-variant/60 shadow-[0_4px_24px_rgba(46,125,91,0.06)] p-6 lg:p-7 flex flex-col h-full">
-                    
-                    <!-- ================= KONDISI 1: AWAL (Persis desain rekomendasi.html) ================= -->
-                    <div id="panel-awal" class="flex flex-col gap-4 flex-1">
-                        <!-- A. Header Rekomendasi -->
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-surface-variant/50">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-primary-container/15 text-primary flex items-center justify-center flex-shrink-0 shadow-xs ring-4 ring-primary/5">
-                                    <span class="material-symbols-outlined text-[22px]">explore</span>
-                                </div>
-                                <div>
-                                    <h2 class="font-headline-sm text-headline-sm text-on-surface">Rekomendasi Wisata untukmu</h2>
-                                    <p class="font-body-sm text-body-sm text-on-surface-variant">Destinasi terbaik berdasarkan preferensi dan bobot penilaianmu.</p>
-                                </div>
+            <!-- SISI KANAN - Area Hasil Rekomendasi (~60% desktop: 7 of 12 cols, h-full) -->
+            <div id="panel-kanan-kolom" class="lg:col-span-7 flex flex-col h-full">
+                
+                <!-- ================= KONDISI 1: AWAL (Persis desain rekomendasi.html) ================= -->
+                <div id="panel-awal" class="bg-surface-container-lowest rounded-2xl border border-surface-variant/60 shadow-[0_4px_24px_rgba(46,125,91,0.06)] p-6 flex flex-col gap-4 h-full">
+                    <!-- A. Header Rekomendasi -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-surface-variant/50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-primary-container/15 text-primary flex items-center justify-center flex-shrink-0 shadow-xs ring-4 ring-primary/5">
+                                <span class="material-symbols-outlined text-[22px]">explore</span>
                             </div>
-                            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-semibold border border-primary/20 w-auto self-start sm:self-center">
-                                <span class="material-symbols-outlined text-[16px]">verified</span>
-                                <span>{{ $totalAktif }} destinasi dianalisis</span>
-                            </div>
-                        </div>
-
-                        <!-- B. Ringkasan Preferensi Aktif -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold flex items-center gap-1.5">
-                                    <span class="material-symbols-outlined text-[16px]">tune</span>
-                                    Ringkasan Preferensi Aktif
-                                </span>
-                                <span id="ringkas-asal-header" class="font-body-sm text-body-sm text-on-surface-variant">Titik Asal: Bandung</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                                <div class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex items-center gap-2.5">
-                                    <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0">location_on</span>
-                                    <div class="min-w-0 flex-1">
-                                        <p class="font-label-sm text-label-sm text-on-surface-variant">Keberangkatan</p>
-                                        <p id="ringkas-asal" class="font-label-md text-label-md text-on-surface font-semibold truncate">Bandung</p>
-                                    </div>
-                                </div>
-                                <div class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex items-center gap-2.5">
-                                    <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0">landscape</span>
-                                    <div class="min-w-0 flex-1">
-                                        <p class="font-label-sm text-label-sm text-on-surface-variant">Jenis Wisata</p>
-                                        <p id="ringkas-jenis" class="font-label-md text-label-md text-on-surface font-semibold truncate">Semua Jenis</p>
-                                    </div>
-                                </div>
-                                <div class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex items-center gap-2.5">
-                                    <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0">commute</span>
-                                    <div class="min-w-0 flex-1">
-                                        <p class="font-label-sm text-label-sm text-on-surface-variant">Jarak Diinginkan</p>
-                                        <p id="ringkas-jarak" class="font-label-md text-label-md text-on-surface font-semibold truncate">~45 km (Dekat)</p>
-                                    </div>
-                                </div>
-                                <div class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex items-center gap-2.5">
-                                    <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0">nature_people</span>
-                                    <div class="min-w-0 flex-1">
-                                        <p class="font-label-sm text-label-sm text-on-surface-variant">Suasana</p>
-                                        <p id="ringkas-suasana" class="font-label-md text-label-md text-on-surface font-semibold truncate">Cenderung Sepi</p>
-                                    </div>
-                                </div>
-                                <div class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex items-center gap-2.5 sm:col-span-2 lg:col-span-2">
-                                    <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0">payments</span>
-                                    <div class="min-w-0 flex-1 flex items-center justify-between">
-                                        <div>
-                                            <p class="font-label-sm text-label-sm text-on-surface-variant">Anggaran Tiket Masuk</p>
-                                            <p id="ringkas-anggaran" class="font-label-md text-label-md text-on-surface font-semibold">Rp 50.000 / orang</p>
-                                        </div>
-                                        <span id="ringkas-anggaran-badge" class="font-label-sm text-label-sm text-primary bg-primary/10 px-2 py-0.5 rounded font-bold">Ekonomis</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- C. Visualisasi Bobot Kriteria ("Prioritas Penilaian") -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h3 class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold flex items-center gap-1.5">
-                                        <span class="material-symbols-outlined text-[16px]">bar_chart</span>
-                                        Prioritas Penilaian
-                                    </h3>
-                                    <p class="font-body-sm text-body-sm text-on-surface-variant">Nilai pembobotan parameter saat ini</p>
-                                </div>
-                                <span class="font-label-sm text-label-sm font-mono text-primary bg-primary-fixed/50 px-2 py-0.5 rounded font-semibold">Skala 100%</span>
-                            </div>
-                            <div class="space-y-2 bg-surface-container-low/60 p-3 rounded-xl border border-surface-variant/40">
-                                <!-- 1. Jarak Tempuh -->
-                                <div class="space-y-1">
-                                    <div class="flex justify-between font-label-sm text-label-sm text-on-surface">
-                                        <span class="flex items-center gap-1.5 font-medium"><span class="material-symbols-outlined text-primary text-[15px]">commute</span>Jarak Tempuh</span>
-                                        <span id="bar-text-jarak" class="text-primary font-bold">27% <span class="text-on-surface-variant font-normal">(Sangat Tinggi)</span></span>
-                                    </div>
-                                    <div class="w-full h-2 rounded-full bg-surface-variant overflow-hidden">
-                                        <div id="bar-fill-jarak" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 27%;"></div>
-                                    </div>
-                                </div>
-                                <!-- 2. Suhu & Kesejukan Udara -->
-                                <div class="space-y-1">
-                                    <div class="flex justify-between font-label-sm text-label-sm text-on-surface">
-                                        <span class="flex items-center gap-1.5 font-medium"><span class="material-symbols-outlined text-primary text-[15px]">device_thermostat</span>Suhu &amp; Kesejukan Udara</span>
-                                        <span id="bar-text-suhu" class="text-primary font-bold">18% <span class="text-on-surface-variant font-normal">(Tinggi)</span></span>
-                                    </div>
-                                    <div class="w-full h-2 rounded-full bg-surface-variant overflow-hidden">
-                                        <div id="bar-fill-suhu" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 18%;"></div>
-                                    </div>
-                                </div>
-                                <!-- 3. Tingkat Keramaian -->
-                                <div class="space-y-1">
-                                    <div class="flex justify-between font-label-sm text-label-sm text-on-surface">
-                                        <span class="flex items-center gap-1.5 font-medium"><span class="material-symbols-outlined text-primary text-[15px]">groups</span>Tingkat Keramaian</span>
-                                        <span id="bar-text-keramaian" class="text-primary font-bold">18% <span class="text-on-surface-variant font-normal">(Tinggi)</span></span>
-                                    </div>
-                                    <div class="w-full h-2 rounded-full bg-surface-variant overflow-hidden">
-                                        <div id="bar-fill-keramaian" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 18%;"></div>
-                                    </div>
-                                </div>
-                                <!-- 4. Kelengkapan Fasilitas -->
-                                <div class="space-y-1">
-                                    <div class="flex justify-between font-label-sm text-label-sm text-on-surface">
-                                        <span class="flex items-center gap-1.5 font-medium"><span class="material-symbols-outlined text-primary text-[15px]">park</span>Kelengkapan Fasilitas</span>
-                                        <span id="bar-text-fasilitas" class="text-primary font-bold">27% <span class="text-on-surface-variant font-normal">(Sangat Tinggi)</span></span>
-                                    </div>
-                                    <div class="w-full h-2 rounded-full bg-surface-variant overflow-hidden">
-                                        <div id="bar-fill-fasilitas" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 27%;"></div>
-                                    </div>
-                                </div>
-                                <!-- 5. Anggaran Tiket -->
-                                <div class="space-y-1">
-                                    <div class="flex justify-between font-label-sm text-label-sm text-on-surface">
-                                        <span class="flex items-center gap-1.5 font-medium"><span class="material-symbols-outlined text-primary text-[15px]">payments</span>Anggaran Tiket</span>
-                                        <span id="bar-text-biaya" class="text-primary font-bold">9% <span class="text-on-surface-variant font-normal">(Sedang)</span></span>
-                                    </div>
-                                    <div class="w-full h-2 rounded-full bg-surface-variant overflow-hidden">
-                                        <div id="bar-fill-biaya" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 9%;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- D. Destinasi Populer Siap Dikalkulasi (4 kartu dari database) -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface font-bold flex items-center gap-1.5">
-                                    <span class="material-symbols-outlined text-secondary text-[16px]">auto_awesome</span>
-                                    Destinasi Populer Siap Dikalkulasi
-                                </span>
-                                <span class="font-label-sm text-label-sm text-primary font-bold bg-primary/10 px-2 py-0.5 rounded">{{ $totalAktif }} Titik Aktif</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                @foreach($populer as $item)
-                                    <div class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex gap-2.5 hover:bg-surface-container-low transition-colors group">
-                                        <img alt="{{ $item->nama }}" class="w-16 h-14 rounded-lg object-cover flex-shrink-0" src="{{ asset('images/destinasi/' . $item->foto) }}" onerror="this.src='{{ asset('images/placeholder.jpg') }}'">
-                                        <div class="min-w-0 flex-1 flex flex-col justify-between">
-                                            <div>
-                                                <div class="flex items-center justify-between gap-1">
-                                                    <h4 class="font-label-md text-label-md font-semibold text-on-surface truncate group-hover:text-primary transition-colors">
-                                                        <a href="{{ url('/destinasi/' . $item->id) }}">{{ $item->nama }}</a>
-                                                    </h4>
-                                                    <span class="font-label-sm text-label-sm bg-primary/10 text-primary font-semibold px-1.5 py-0.2 rounded flex-shrink-0">{{ $item->jenis }}</span>
-                                                </div>
-                                                <p class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">{{ $item->wilayah }}</p>
-                                            </div>
-                                            <p class="font-body-sm text-body-sm text-primary font-semibold">
-                                                {{ $item->biaya > 0 ? 'Mulai Rp ' . number_format($item->biaya, 0, ',', '.') : 'Gratis' }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <!-- E. Panduan Metode VIKOR ("Bagaimana Rekomendasi Dihitung?") -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold flex items-center gap-1.5">
-                                    <span class="material-symbols-outlined text-[16px]">psychology</span>
-                                    Bagaimana Rekomendasi Dihitung?
-                                </span>
-                                <span class="font-label-sm text-label-sm text-on-surface-variant font-mono">Multi-Criteria VIKOR</span>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                <div class="p-2.5 rounded-xl bg-surface-container-low/60 border border-surface-variant/40 flex flex-col justify-between">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <div class="w-5 h-5 rounded-full bg-primary-container text-on-primary font-bold text-[11px] flex items-center justify-center flex-shrink-0">1</div>
-                                        <span class="font-label-sm text-label-sm font-semibold text-on-surface">Prioritas Kriteria</span>
-                                    </div>
-                                    <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">Penilaian mengikuti pembobotan preferensi Anda.</p>
-                                </div>
-                                <div class="p-2.5 rounded-xl bg-surface-container-low/60 border border-surface-variant/40 flex flex-col justify-between">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <div class="w-5 h-5 rounded-full bg-primary-container text-on-primary font-bold text-[11px] flex items-center justify-center flex-shrink-0">2</div>
-                                        <span class="font-label-sm text-label-sm font-semibold text-on-surface">Perbandingan Alternatif</span>
-                                    </div>
-                                    <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">Destinasi dibandingkan menyeluruh berdasarkan matriks kriteria.</p>
-                                </div>
-                                <div class="p-2.5 rounded-xl bg-surface-container-low/60 border border-surface-variant/40 flex flex-col justify-between">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <div class="w-5 h-5 rounded-full bg-primary-container text-on-primary font-bold text-[11px] flex items-center justify-center flex-shrink-0">3</div>
-                                        <span class="font-label-sm text-label-sm font-semibold text-on-surface">Peringkat Optimal</span>
-                                    </div>
-                                    <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">Hasil disusun berdasarkan nilai indeks kompromi terbaik (Q-score).</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- F. Status & Banner Transparansi (Tanpa angka karangan) -->
-                        <div class="space-y-2.5 pt-1 border-t border-surface-variant/50">
-                            <!-- Metrik Singkat -->
-                            <div class="flex flex-wrap items-center justify-between gap-2 p-2 rounded-xl bg-surface-container-low/80 border border-surface-variant/40 font-label-sm text-label-sm text-on-surface">
-                                <span class="inline-flex items-center gap-1"><span class="text-on-surface-variant">Metode:</span> <strong class="text-primary">VIKOR</strong></span>
-                                <span class="text-outline-variant">•</span>
-                                <span class="inline-flex items-center gap-1"><span class="text-on-surface-variant">Kriteria:</span> <strong class="text-primary">5 Parameter</strong></span>
-                                <span class="text-outline-variant">•</span>
-                                <span class="inline-flex items-center gap-1"><span class="text-on-surface-variant">Destinasi:</span> <strong class="text-primary">{{ $totalAktif }} Lokasi</strong></span>
-                                <span class="text-outline-variant">•</span>
-                                <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-primary text-[15px]">verified_user</span> <span class="text-primary font-semibold">Objektif &amp; Transparan</span></span>
-                            </div>
-                            <!-- Jaminan Banner -->
-                            <div class="p-3 rounded-xl bg-primary/5 border border-primary/20 flex items-start gap-2.5 text-left">
-                                <div class="w-6 h-6 rounded-lg bg-primary text-on-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <span class="material-symbols-outlined text-[16px]">verified</span>
-                                </div>
-                                <div class="flex-1">
-                                    <h4 class="font-label-md text-label-md text-primary font-bold">Jaminan Rekomendasi Objektif &amp; Bebas Bias</h4>
-                                    <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-relaxed">Seluruh pemeringkatan dihitung murni berbasis kompromi multikriteria VIKOR dari preferensi Anda, tanpa intervensi promosi berbayar.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- G. Insight Perjalanan -->
-                        <div class="space-y-2 pt-2 border-t border-surface-variant/50">
-                            <div class="flex items-center justify-between">
-                                <h3 class="font-label-md text-label-md font-semibold text-on-surface flex items-center gap-1.5">
-                                    <span class="material-symbols-outlined text-secondary text-[17px]">lightbulb</span>
-                                    Insight Perjalanan
-                                </h3>
-                                <span class="font-body-sm text-body-sm text-on-surface-variant">Panduan cerdas untuk Anda</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                <div class="p-4 rounded-xl bg-surface-container-low/60 border border-surface-variant/40 flex flex-col justify-between hover:bg-surface-container-low transition-colors">
-                                    <div class="flex items-start gap-3">
-                                        <div class="w-8 h-8 rounded-lg bg-primary-container/20 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                                            <span class="material-symbols-outlined text-[18px]">explore</span>
-                                        </div>
-                                        <div class="min-w-0 flex-1">
-                                            <h4 class="font-label-md text-label-md font-semibold text-on-surface">Pilihan Paling Sesuai</h4>
-                                            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">Prioritaskan destinasi yang memenuhi bobot kriteria perjalananmu dengan keseimbangan terbaik antara jarak, suasana, fasilitas, dan biaya.</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex flex-wrap gap-2 mt-3 pl-11">
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
-                                            <span class="material-symbols-outlined text-[13px]">near_me</span>Jarak
-                                        </span>
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
-                                            <span class="material-symbols-outlined text-[13px]">spa</span>Kenyamanan
-                                        </span>
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
-                                            <span class="material-symbols-outlined text-[13px]">payments</span>Anggaran
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="p-4 rounded-xl bg-surface-container-low/60 border border-surface-variant/40 flex flex-col justify-between hover:bg-surface-container-low transition-colors">
-                                    <div class="flex items-start gap-3">
-                                        <div class="w-8 h-8 rounded-lg bg-secondary/15 text-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
-                                            <span class="material-symbols-outlined text-[18px]">calendar_today</span>
-                                        </div>
-                                        <div class="min-w-0 flex-1">
-                                            <h4 class="font-label-md text-label-md font-semibold text-on-surface">Persiapkan Perjalanan</h4>
-                                            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">Periksa kondisi cuaca, jam operasional, biaya terbaru, dan akses menuju lokasi sebelum berangkat.</p>
-                                        </div>
-                                    </div>
-                                    <div class="space-y-1.5 mt-3 pl-11">
-                                        <div class="flex items-center gap-1.5 text-body-sm text-on-surface-variant font-medium">
-                                            <span class="material-symbols-outlined text-primary text-[15px]">check_circle</span>
-                                            <span>Periksa prakiraan cuaca.</span>
-                                        </div>
-                                        <div class="flex items-center gap-1.5 text-body-sm text-on-surface-variant font-medium">
-                                            <span class="material-symbols-outlined text-primary text-[15px]">check_circle</span>
-                                            <span>Pastikan jam operasional.</span>
-                                        </div>
-                                        <div class="flex items-center gap-1.5 text-body-sm text-on-surface-variant font-medium">
-                                            <span class="material-symbols-outlined text-primary text-[15px]">check_circle</span>
-                                            <span>Siapkan anggaran perjalanan.</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ================= KONDISI 2: MEMUAT (Skeleton Loading) ================= -->
-                    <div id="panel-memuat" class="hidden flex-col gap-4 flex-1">
-                        <div class="flex items-center gap-3 pb-3 border-b border-surface-variant/50">
-                            <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                            <span class="font-headline-sm text-headline-sm text-primary">Menghitung...</span>
-                        </div>
-
-                        <div class="space-y-4 flex-1">
-                            @for($i = 0; $i < 4; $i++)
-                                <div class="p-4 rounded-2xl bg-surface-container-low border border-surface-variant/40 animate-pulse flex flex-col md:flex-row gap-4">
-                                    <div class="w-full md:w-44 h-36 bg-surface-variant/70 rounded-xl flex-shrink-0"></div>
-                                    <div class="flex-1 space-y-3 py-1">
-                                        <div class="h-4 bg-surface-variant/70 rounded w-1/3"></div>
-                                        <div class="h-6 bg-surface-variant/70 rounded w-2/3"></div>
-                                        <div class="h-4 bg-surface-variant/70 rounded w-1/2"></div>
-                                        <div class="h-4 bg-surface-variant/50 rounded w-full"></div>
-                                    </div>
-                                </div>
-                            @endfor
-                        </div>
-                    </div>
-
-                    <!-- ================= KONDISI 3: HASIL REKOMENDASI (Persis hasil.html) ================= -->
-                    <div id="panel-hasil" class="hidden flex-col gap-5 flex-1">
-                        <!-- Header Hasil & Quick Filter Info -->
-                        <div class="bg-surface-container-low/50 rounded-2xl p-4 sm:p-5 border border-surface-variant/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="w-3 h-3 rounded-full bg-primary-container"></span>
-                                    <h2 class="font-headline-md text-headline-md text-on-surface">
-                                        <span id="hasil-jumlah-top">5</span> Destinasi Terbaik Ditemukan
-                                    </h2>
-                                </div>
-                                <p id="hasil-subteks" class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
-                                    Menampilkan 5 teratas dari 12 destinasi • Berdasarkan keberangkatan Bandung
-                                </p>
+                                <h2 class="font-headline-sm text-headline-sm text-on-surface">Rekomendasi Wisata untukmu</h2>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant">Destinasi terbaik berdasarkan preferensi dan bobot penilaianmu.</p>
                             </div>
-                            <div class="flex items-center gap-2 self-start sm:self-auto">
-                                <span id="hasil-badge-mode" class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm flex items-center gap-1.5 font-semibold">
-                                    <span class="material-symbols-outlined text-[14px]">verified</span>
-                                    <span>Satu pilihan terbaik</span>
+                        </div>
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-semibold border border-primary/20 w-auto self-start sm:self-center">
+                            <span class="material-symbols-outlined text-[16px]">verified</span>
+                            <span>{{ $totalAktif }} destinasi dianalisis</span>
+                        </div>
+                    </div>
+
+                    <!-- B. Ringkasan Preferensi Aktif -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">tune</span>
+                                Ringkasan Preferensi Aktif
+                            </span>
+                            <span id="ringkas-asal-header" class="font-body-sm text-body-sm text-on-surface-variant">Titik Asal: Bandung</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                            <div class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex items-center gap-2.5">
+                                <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0">location_on</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-label-sm text-label-sm text-on-surface-variant">Keberangkatan</p>
+                                    <p id="ringkas-asal" class="font-label-md text-label-md text-on-surface font-semibold truncate">Bandung</p>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex items-center gap-2.5">
+                                <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0">landscape</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-label-sm text-label-sm text-on-surface-variant">Jenis Wisata</p>
+                                    <p id="ringkas-jenis" class="font-label-md text-label-md text-on-surface font-semibold truncate">Semua Jenis</p>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex items-center gap-2.5">
+                                <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0">commute</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-label-sm text-label-sm text-on-surface-variant">Jarak Diinginkan</p>
+                                    <p id="ringkas-jarak" class="font-label-md text-label-md text-on-surface font-semibold truncate">~45 km (Dekat)</p>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex items-center gap-2.5">
+                                <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0">nature_people</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-label-sm text-label-sm text-on-surface-variant">Suasana</p>
+                                    <p id="ringkas-suasana" class="font-label-md text-label-md text-on-surface font-semibold truncate">Cenderung Sepi</p>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex items-center gap-2.5 sm:col-span-2 lg:col-span-2">
+                                <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0">payments</span>
+                                <div class="min-w-0 flex-1 flex items-center justify-between">
+                                    <div>
+                                        <p class="font-label-sm text-label-sm text-on-surface-variant">Anggaran Tiket Masuk</p>
+                                        <p id="ringkas-anggaran" class="font-label-md text-label-md text-on-surface font-semibold">Rp 50.000 / orang</p>
+                                    </div>
+                                    <span id="ringkas-anggaran-badge" class="font-label-sm text-label-sm text-primary bg-primary/10 px-2 py-0.5 rounded font-bold">Ekonomis</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- C. Visualisasi Bobot Kriteria ("Prioritas Penilaian") -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[16px]">bar_chart</span>
+                                    Prioritas Penilaian
+                                </h3>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant">Nilai pembobotan parameter saat ini</p>
+                            </div>
+                            <span class="font-label-sm text-label-sm font-mono text-primary bg-primary-fixed/50 px-2 py-0.5 rounded font-semibold">Skala 100%</span>
+                        </div>
+                        <div class="space-y-2 bg-surface-container-low/60 p-3 rounded-xl border border-surface-variant/40">
+                            <!-- 1. Jarak Tempuh -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between font-label-sm text-label-sm text-on-surface">
+                                    <span class="flex items-center gap-1.5 font-medium"><span class="material-symbols-outlined text-primary text-[15px]">commute</span>Jarak Tempuh</span>
+                                    <span id="bar-text-jarak" class="text-primary font-bold">27% <span class="text-on-surface-variant font-normal">(Sangat Tinggi)</span></span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-surface-variant overflow-hidden">
+                                    <div id="bar-fill-jarak" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 27%;"></div>
+                                </div>
+                            </div>
+                            <!-- 2. Suhu & Kesejukan Udara -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between font-label-sm text-label-sm text-on-surface">
+                                    <span class="flex items-center gap-1.5 font-medium"><span class="material-symbols-outlined text-primary text-[15px]">device_thermostat</span>Suhu &amp; Kesejukan Udara</span>
+                                    <span id="bar-text-suhu" class="text-primary font-bold">18% <span class="text-on-surface-variant font-normal">(Tinggi)</span></span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-surface-variant overflow-hidden">
+                                    <div id="bar-fill-suhu" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 18%;"></div>
+                                </div>
+                            </div>
+                            <!-- 3. Tingkat Keramaian -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between font-label-sm text-label-sm text-on-surface">
+                                    <span class="flex items-center gap-1.5 font-medium"><span class="material-symbols-outlined text-primary text-[15px]">groups</span>Tingkat Keramaian</span>
+                                    <span id="bar-text-keramaian" class="text-primary font-bold">18% <span class="text-on-surface-variant font-normal">(Tinggi)</span></span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-surface-variant overflow-hidden">
+                                    <div id="bar-fill-keramaian" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 18%;"></div>
+                                </div>
+                            </div>
+                            <!-- 4. Kelengkapan Fasilitas -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between font-label-sm text-label-sm text-on-surface">
+                                    <span class="flex items-center gap-1.5 font-medium"><span class="material-symbols-outlined text-primary text-[15px]">park</span>Kelengkapan Fasilitas</span>
+                                    <span id="bar-text-fasilitas" class="text-primary font-bold">27% <span class="text-on-surface-variant font-normal">(Sangat Tinggi)</span></span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-surface-variant overflow-hidden">
+                                    <div id="bar-fill-fasilitas" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 27%;"></div>
+                                </div>
+                            </div>
+                            <!-- 5. Anggaran Tiket -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between font-label-sm text-label-sm text-on-surface">
+                                    <span class="flex items-center gap-1.5 font-medium"><span class="material-symbols-outlined text-primary text-[15px]">payments</span>Anggaran Tiket</span>
+                                    <span id="bar-text-biaya" class="text-primary font-bold">9% <span class="text-on-surface-variant font-normal">(Sedang)</span></span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-surface-variant overflow-hidden">
+                                    <div id="bar-fill-biaya" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 9%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- D. Destinasi Populer Siap Dikalkulasi (4 kartu dari database) -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface font-bold flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-secondary text-[16px]">auto_awesome</span>
+                                Destinasi Populer Siap Dikalkulasi
+                            </span>
+                            <span class="font-label-sm text-label-sm text-primary font-bold bg-primary/10 px-2 py-0.5 rounded">{{ $totalAktif }} Titik Aktif</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            @foreach($populer as $item)
+                                @php
+                                    $parts = explode(',', $item->wilayah);
+                                    $kabKota = trim(end($parts));
+                                @endphp
+                                <a href="{{ url('/destinasi/' . $item->id) }}" class="p-2.5 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex gap-2.5 hover:bg-surface-container-low transition-colors group cursor-pointer">
+                                    <img alt="{{ $item->nama }}" class="w-16 h-14 rounded-lg object-cover flex-shrink-0" src="{{ asset('images/destinasi/' . $item->foto) }}" onerror="this.src='{{ asset('images/placeholder.jpg') }}'">
+                                    <div class="min-w-0 flex-1 flex flex-col justify-between">
+                                        <div>
+                                            <div class="flex items-center justify-between gap-1">
+                                                <h4 class="font-label-md text-label-md font-semibold text-on-surface truncate group-hover:text-primary transition-colors">{{ $item->nama }}</h4>
+                                                <span class="font-label-sm text-label-sm bg-primary/10 text-primary font-semibold px-1.5 py-0.2 rounded flex-shrink-0">{{ $item->jenis }}</span>
+                                            </div>
+                                            <p class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">{{ $kabKota }} • {{ $item->suhu }}°C</p>
+                                        </div>
+                                        <p class="font-body-sm text-body-sm text-primary font-semibold">
+                                            {{ $item->biaya > 0 ? 'Mulai Rp ' . number_format($item->biaya, 0, ',', '.') : 'Gratis' }}
+                                        </p>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- E. Panduan Metode VIKOR ("Bagaimana Rekomendasi Dihitung?") -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">psychology</span>
+                                Bagaimana Rekomendasi Dihitung?
+                            </span>
+                            <span class="font-label-sm text-label-sm text-on-surface-variant font-mono">Multi-Criteria VIKOR</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                            <div class="p-2.5 rounded-xl bg-surface-container-low/60 border border-surface-variant/40 flex flex-col justify-between">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <div class="w-5 h-5 rounded-full bg-primary-container text-on-primary font-bold text-[11px] flex items-center justify-center flex-shrink-0">1</div>
+                                    <span class="font-label-sm text-label-sm font-semibold text-on-surface">Prioritas Kriteria</span>
+                                </div>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">Penilaian mengikuti pembobotan preferensi Anda.</p>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-surface-container-low/60 border border-surface-variant/40 flex flex-col justify-between">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <div class="w-5 h-5 rounded-full bg-primary-container text-on-primary font-bold text-[11px] flex items-center justify-center flex-shrink-0">2</div>
+                                    <span class="font-label-sm text-label-sm font-semibold text-on-surface">Perbandingan Alternatif</span>
+                                </div>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">Destinasi dibandingkan menyeluruh berdasarkan matriks kriteria.</p>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-surface-container-low/60 border border-surface-variant/40 flex flex-col justify-between">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <div class="w-5 h-5 rounded-full bg-primary-container text-on-primary font-bold text-[11px] flex items-center justify-center flex-shrink-0">3</div>
+                                    <span class="font-label-sm text-label-sm font-semibold text-on-surface">Peringkat Optimal</span>
+                                </div>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">Hasil disusun berdasarkan nilai indeks kompromi terbaik (Q-score).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- F. Status & Banner Transparansi -->
+                    <div class="space-y-2.5 pt-1 border-t border-surface-variant/50">
+                        <!-- Metrik Singkat -->
+                        <div class="flex flex-wrap items-center justify-between gap-2 p-2 rounded-xl bg-surface-container-low/80 border border-surface-variant/40 font-label-sm text-label-sm text-on-surface">
+                            <span class="inline-flex items-center gap-1"><span class="text-on-surface-variant">Metode:</span> <strong class="text-primary">VIKOR</strong></span>
+                            <span class="text-outline-variant">•</span>
+                            <span class="inline-flex items-center gap-1"><span class="text-on-surface-variant">Kriteria:</span> <strong class="text-primary">5 Parameter</strong></span>
+                            <span class="text-outline-variant">•</span>
+                            <span class="inline-flex items-center gap-1"><span class="text-on-surface-variant">Destinasi:</span> <strong class="text-primary">{{ $totalAktif }} Lokasi</strong></span>
+                            <span class="text-outline-variant">•</span>
+                            <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-primary text-[15px]">verified_user</span> <span class="text-primary font-semibold">Objektif &amp; Transparan</span></span>
+                        </div>
+                        <!-- Jaminan Banner -->
+                        <div class="p-3 rounded-xl bg-primary/5 border border-primary/20 flex items-start gap-2.5 text-left">
+                            <div class="w-6 h-6 rounded-lg bg-primary text-on-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="material-symbols-outlined text-[16px]">verified</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-label-md text-label-md text-primary font-bold">Jaminan Rekomendasi Objektif &amp; Bebas Bias</h4>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-relaxed">Seluruh pemeringkatan dihitung murni berbasis kompromi multikriteria VIKOR dari preferensi Anda, tanpa intervensi promosi berbayar.</p>
+                            </div>
+                        </div>
+                        <!-- Metadata Footer Baris -->
+                        <div class="flex flex-wrap items-center justify-center gap-3 font-body-sm text-body-sm text-on-surface-variant text-center pt-1">
+                            <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-primary text-[15px]">check_circle</span>{{ $totalDestinasi }} Destinasi</span>
+                            <span>•</span>
+                            <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-primary text-[15px]">location_city</span>{{ $totalKabupatenKota }} Wilayah Kabupaten/Kota</span>
+                        </div>
+                    </div>
+
+                    <!-- 1. Section: Gambaran Data Destinasi (Data Nyata dari Database) -->
+                    <div class="space-y-2 pt-2 border-t border-surface-variant/50">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-label-md text-label-md font-semibold text-on-surface flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-primary text-[17px]">analytics</span>
+                                    Gambaran Data Destinasi
+                                </h3>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant">Komposisi {{ $totalDestinasi }} destinasi di database</p>
+                            </div>
+                            <span class="font-label-sm text-label-sm font-mono text-primary bg-primary/10 px-2 py-0.5 rounded font-bold">Data Nyata</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                            <!-- Kartu 1: Destinasi Sejuk -->
+                            <div class="p-3 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex flex-col justify-between space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-lg bg-primary-container/20 text-primary flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-[16px]">eco</span>
+                                        </div>
+                                        <span class="font-label-md text-label-md font-semibold text-on-surface">Destinasi Sejuk</span>
+                                    </div>
+                                    <span class="font-label-sm text-label-sm font-bold text-primary">{{ $pctSejuk }}%</span>
+                                </div>
+                                <div class="w-full h-1.5 rounded-full bg-surface-variant overflow-hidden">
+                                    <div class="h-full bg-primary rounded-full" style="width: {{ $pctSejuk }}%;"></div>
+                                </div>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">Destinasi dengan suhu sejuk hingga dingin (≤ 20°C).</p>
+                            </div>
+                            <!-- Kartu 2: Tiket Terjangkau -->
+                            <div class="p-3 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex flex-col justify-between space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-lg bg-primary-container/20 text-primary flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-[16px]">wallet</span>
+                                        </div>
+                                        <span class="font-label-md text-label-md font-semibold text-on-surface">Tiket Terjangkau</span>
+                                    </div>
+                                    <span class="font-label-sm text-label-sm font-bold text-primary">{{ $pctTerjangkau }}%</span>
+                                </div>
+                                <div class="w-full h-1.5 rounded-full bg-surface-variant overflow-hidden">
+                                    <div class="h-full bg-primary rounded-full" style="width: {{ $pctTerjangkau }}%;"></div>
+                                </div>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">Destinasi dengan tiket masuk hemat (≤ Rp 30.000).</p>
+                            </div>
+                            <!-- Kartu 3: Rating Tinggi -->
+                            <div class="p-3 rounded-xl bg-surface-container-low/70 border border-surface-variant/40 flex flex-col justify-between space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-lg bg-primary-container/20 text-primary flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-[16px]">near_me</span>
+                                        </div>
+                                        <span class="font-label-md text-label-md font-semibold text-on-surface">Rating Tinggi</span>
+                                    </div>
+                                    <span class="font-label-sm text-label-sm font-bold text-primary">{{ $pctRatingTinggi }}%</span>
+                                </div>
+                                <div class="w-full h-1.5 rounded-full bg-surface-variant overflow-hidden">
+                                    <div class="h-full bg-primary rounded-full" style="width: {{ $pctRatingTinggi }}%;"></div>
+                                </div>
+                                <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">Destinasi dengan ulasan kepuasan tinggi (≥ 4.5).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- G. Insight Perjalanan -->
+                    <div class="space-y-2 pt-2 border-t border-surface-variant/50">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-label-md text-label-md font-semibold text-on-surface flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-secondary text-[17px]">lightbulb</span>
+                                Insight Perjalanan
+                            </h3>
+                            <span class="font-body-sm text-body-sm text-on-surface-variant">Panduan cerdas untuk Anda</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div class="p-4 rounded-xl bg-surface-container-low/60 border border-surface-variant/40 flex flex-col justify-between hover:bg-surface-container-low transition-colors">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-primary-container/20 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span class="material-symbols-outlined text-[18px]">explore</span>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-label-md text-label-md font-semibold text-on-surface">Pilihan Paling Sesuai</h4>
+                                        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">Prioritaskan destinasi yang memenuhi bobot kriteria perjalananmu dengan keseimbangan terbaik antara jarak, suasana, fasilitas, dan biaya.</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mt-3 pl-11">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
+                                        <span class="material-symbols-outlined text-[13px]">near_me</span>Jarak
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
+                                        <span class="material-symbols-outlined text-[13px]">spa</span>Kenyamanan
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
+                                        <span class="material-symbols-outlined text-[13px]">payments</span>Anggaran
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="p-4 rounded-xl bg-surface-container-low/60 border border-surface-variant/40 flex flex-col justify-between hover:bg-surface-container-low transition-colors">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-secondary/15 text-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-label-md text-label-md font-semibold text-on-surface">Persiapkan Perjalanan</h4>
+                                        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">Periksa kondisi cuaca, jam operasional, biaya terbaru, dan akses menuju lokasi sebelum berangkat.</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-1.5 mt-3 pl-11">
+                                    <div class="flex items-center gap-1.5 text-body-sm text-on-surface-variant font-medium">
+                                        <span class="material-symbols-outlined text-primary text-[15px]">check_circle</span>
+                                        <span>Periksa prakiraan cuaca.</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 text-body-sm text-on-surface-variant font-medium">
+                                        <span class="material-symbols-outlined text-primary text-[15px]">check_circle</span>
+                                        <span>Pastikan jam operasional.</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 text-body-sm text-on-surface-variant font-medium">
+                                        <span class="material-symbols-outlined text-primary text-[15px]">check_circle</span>
+                                        <span>Siapkan anggaran perjalanan.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= KONDISI 2: MEMUAT (Skeleton Loading) ================= -->
+                <div id="panel-memuat" class="hidden space-y-6">
+                    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex items-center gap-3">
+                        <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        <span class="font-headline-sm text-headline-sm text-primary">Menghitung Rekomendasi VIKOR...</span>
+                    </div>
+
+                    <div class="space-y-5">
+                        @for($i = 0; $i < 3; $i++)
+                            <div class="bg-surface-container-lowest rounded-2xl p-6 border border-surface-variant/40 shadow-sm animate-pulse flex flex-col md:flex-row gap-5">
+                                <div class="w-full md:w-5/12 h-48 bg-surface-variant/70 rounded-xl flex-shrink-0"></div>
+                                <div class="flex-1 space-y-3 py-2">
+                                    <div class="h-4 bg-surface-variant/70 rounded w-1/3"></div>
+                                    <div class="h-6 bg-surface-variant/70 rounded w-2/3"></div>
+                                    <div class="h-4 bg-surface-variant/70 rounded w-1/2"></div>
+                                    <div class="h-4 bg-surface-variant/50 rounded w-full"></div>
+                                </div>
+                            </div>
+                        @endfor
+                    </div>
+                </div>
+
+                <!-- ================= KONDISI 3: HASIL REKOMENDASI (Persis hasil.html) ================= -->
+                <div id="panel-hasil" class="hidden space-y-6 flex-col">
+                    <!-- Header Hasil & Quick Filter Info (Persis hasil.html baris 273) -->
+                    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-primary-container"></span>
+                                <h2 class="font-headline-md text-headline-md text-on-surface">
+                                    <span id="hasil-jumlah-top">5</span> Destinasi Terbaik Ditemukan
+                                </h2>
+                            </div>
+                            <p id="hasil-subteks" class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                                Menampilkan 5 teratas dari 12 destinasi • Berdasarkan keberangkatan Bandung
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2 self-start sm:self-auto">
+                            <span id="hasil-badge-mode" class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm flex items-center gap-1.5 font-semibold">
+                                <span class="material-symbols-outlined text-[14px]">verified</span>
+                                <span>Satu pilihan terbaik</span>
+                            </span>
+                            <button class="p-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" title="Bagikan Hasil" type="button">
+                                <span class="material-symbols-outlined text-[18px]">share</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Daftar Kartu Peringkat (Persis hasil.html baris 292, spasi 20px) -->
+                    <div id="hasil-cards-container" class="space-y-5">
+                        <!-- Kartu hasil dirender secara dinamis oleh JavaScript -->
+                    </div>
+
+                    <!-- 3. Bagian Edukatif: "Lihat Cara Menghitung & Matriks Keputusan VIKOR" (hasil.html baris 541) -->
+                    <div class="bg-surface-container-lowest rounded-2xl border border-surface-variant/60 p-6 shadow-sm">
+                        <details class="group cursor-pointer">
+                            <summary class="flex items-center justify-between font-headline-sm text-headline-sm text-primary list-none select-none">
+                                <span class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[22px]">calculate</span>
+                                    Lihat cara menghitung
                                 </span>
-                            </div>
-                        </div>
+                                <span class="material-symbols-outlined transition-transform duration-200 group-open:rotate-180">
+                                    expand_more
+                                </span>
+                            </summary>
 
-                        <!-- Daftar Kartu Peringkat (flex-1 flex flex-col gap-4 dengan tiap kartu flex-1) -->
-                        <div id="hasil-cards-container" class="flex-1 flex flex-col gap-4">
-                            <!-- Kartu hasil dirender secara dinamis oleh JavaScript -->
-                        </div>
+                            <div class="pt-6 mt-4 border-t border-surface-variant/60 space-y-6 text-on-surface font-body-md text-body-md cursor-auto">
+                                <!-- Rumus Persen -->
+                                <div class="p-4 rounded-xl bg-surface-container-low border border-surface-variant/40 space-y-2">
+                                    <h3 class="font-title text-title text-on-surface font-semibold">Rumus Kecocokan Relatif (Persen)</h3>
+                                    <p class="font-mono text-sm bg-surface-container px-3 py-2 rounded-lg text-primary font-bold inline-block">
+                                        persen = round((1 - Q) × 100, 1)
+                                    </p>
+                                    <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                                        Karena nilai indeks kompromi Q dinormalisasi antar kandidat (makin kecil makin baik), persen bersifat <strong>relatif terhadap kandidat saat ini</strong>: kandidat peringkat 1 selalu bernilai 100% dan yang paling bawah 0%.
+                                    </p>
+                                </div>
 
-                        <!-- 3. Bagian Edukatif: "Lihat Cara Menghitung & Matriks Keputusan VIKOR" -->
-                        <div class="bg-surface-container-lowest rounded-2xl border border-surface-variant/60 p-5 shadow-sm mt-2">
-                            <details class="group cursor-pointer">
-                                <summary class="flex items-center justify-between font-headline-sm text-headline-sm text-primary list-none select-none">
-                                    <span class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-[22px]">calculate</span>
-                                        Lihat cara menghitung
-                                    </span>
-                                    <span class="material-symbols-outlined transition-transform duration-200 group-open:rotate-180">
-                                        expand_more
-                                    </span>
-                                </summary>
-
-                                <div class="pt-6 mt-4 border-t border-surface-variant/60 space-y-6 text-on-surface font-body-md text-body-md cursor-auto">
-                                    <!-- Rumus Persen -->
-                                    <div class="p-4 rounded-xl bg-surface-container-low border border-surface-variant/40 space-y-2">
-                                        <h3 class="font-title text-title text-on-surface font-semibold">Rumus Kecocokan Relatif (Persen)</h3>
-                                        <p class="font-mono text-sm bg-surface-container px-3 py-2 rounded-lg text-primary font-bold inline-block">
-                                            persen = round((1 - Q) × 100, 1)
-                                        </p>
-                                        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-                                            Karena nilai indeks kompromi Q dinormalisasi antar kandidat (makin kecil makin baik), persen bersifat <strong>relatif terhadap kandidat saat ini</strong>: kandidat peringkat 1 selalu bernilai 100% dan yang paling bawah 0%.
-                                        </p>
-                                    </div>
-
-                                    <!-- Hasil Uji Keunggulan & Kestabilan -->
-                                    <div class="p-4 rounded-xl bg-surface-container-low border border-surface-variant/40 space-y-3">
-                                        <h3 class="font-title text-title text-on-surface font-semibold">Hasil Uji Kompromi VIKOR</h3>
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-body-sm">
-                                            <div class="p-3 rounded-lg bg-surface-container border border-surface-variant/30 space-y-1">
-                                                <span class="font-label-sm text-label-sm text-on-surface-variant block">Uji Keunggulan (Acceptable Advantage)</span>
-                                                <span id="calc-keunggulan" class="font-semibold text-on-surface block">-</span>
-                                                <span id="calc-dq" class="text-xs text-on-surface-variant block font-mono">Batas DQ = 1/(m-1)</span>
-                                            </div>
-                                            <div class="p-3 rounded-lg bg-surface-container border border-surface-variant/30 space-y-1">
-                                                <span class="font-label-sm text-label-sm text-on-surface-variant block">Uji Kestabilan (Acceptable Stability)</span>
-                                                <span id="calc-kestabilan" class="font-semibold text-on-surface block">-</span>
-                                                <span class="text-xs text-on-surface-variant block">A1 terbaik pada utilitas S atau penyesalan R</span>
-                                            </div>
+                                <!-- Hasil Uji Keunggulan & Kestabilan -->
+                                <div class="p-4 rounded-xl bg-surface-container-low border border-surface-variant/40 space-y-3">
+                                    <h3 class="font-title text-title text-on-surface font-semibold">Hasil Uji Kompromi VIKOR</h3>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-body-sm">
+                                        <div class="p-3 rounded-lg bg-surface-container border border-surface-variant/30 space-y-1">
+                                            <span class="font-label-sm text-label-sm text-on-surface-variant block">Uji Keunggulan (Acceptable Advantage)</span>
+                                            <span id="calc-keunggulan" class="font-semibold text-on-surface block">-</span>
+                                            <span id="calc-dq" class="text-xs text-on-surface-variant block font-mono">Batas DQ = 1/(m-1)</span>
                                         </div>
-                                        <div class="pt-2 text-body-sm text-on-surface-variant">
-                                            Mode keputusan yang dihasilkan: <strong id="calc-mode-hasil" class="text-primary font-bold">-</strong>
+                                        <div class="p-3 rounded-lg bg-surface-container border border-surface-variant/30 space-y-1">
+                                            <span class="font-label-sm text-label-sm text-on-surface-variant block">Uji Kestabilan (Acceptable Stability)</span>
+                                            <span id="calc-kestabilan" class="font-semibold text-on-surface block">-</span>
+                                            <span class="text-xs text-on-surface-variant block">A1 terbaik pada utilitas S atau penyesalan R</span>
                                         </div>
                                     </div>
-
-                                    <!-- Bobot Ternormalisasi -->
-                                    <div class="space-y-2">
-                                        <h3 class="font-title text-title text-on-surface font-semibold">Bobot Ternormalisasi Kriteria</h3>
-                                        <div id="calc-bobot-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                                            <!-- Bobot ternormalisasi dari API -->
-                                        </div>
-                                    </div>
-
-                                    <!-- Tabel Nilai Ideal (f*) dan Terburuk (f-) -->
-                                    <div class="space-y-2">
-                                        <h3 class="font-title text-title text-on-surface font-semibold">Nilai Ideal (f*) dan Terburuk (f-)</h3>
-                                        <div class="overflow-x-auto rounded-xl border border-surface-variant/50">
-                                            <table class="w-full text-left text-body-sm border-collapse">
-                                                <thead class="bg-surface-container font-label-md text-label-md text-on-surface">
-                                                    <tr>
-                                                        <th class="p-3">Kriteria</th>
-                                                        <th class="p-3">Tipe</th>
-                                                        <th class="p-3">Target Pilihan</th>
-                                                        <th class="p-3 text-primary">Nilai Ideal (f*)</th>
-                                                        <th class="p-3 text-secondary">Nilai Terburuk (f-)</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="calc-tabel-ideal" class="divide-y divide-surface-variant/40 bg-surface-container-lowest">
-                                                    <!-- Nilai ideal f* dan f- -->
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <!-- Tabel S, R, Q Semua Kandidat -->
-                                    <div class="space-y-2">
-                                        <h3 class="font-title text-title text-on-surface font-semibold">Tabel Nilai S, R, dan Q Semua Kandidat</h3>
-                                        <div class="overflow-x-auto rounded-xl border border-surface-variant/50">
-                                            <table class="w-full text-left text-body-sm border-collapse">
-                                                <thead class="bg-surface-container font-label-md text-label-md text-on-surface">
-                                                    <tr>
-                                                        <th class="p-3 text-center">Peringkat</th>
-                                                        <th class="p-3">Destinasi</th>
-                                                        <th class="p-3">S (Utilitas)</th>
-                                                        <th class="p-3">R (Penyesalan)</th>
-                                                        <th class="p-3">Q (Kompromi)</th>
-                                                        <th class="p-3">Kecocokan Relatif</th>
-                                                        <th class="p-3">Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="calc-tabel-srq" class="divide-y divide-surface-variant/40 bg-surface-container-lowest">
-                                                    <!-- Nilai S, R, Q -->
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                    <div class="pt-2 text-body-sm text-on-surface-variant">
+                                        Mode keputusan yang dihasilkan: <strong id="calc-mode-hasil" class="text-primary font-bold">-</strong>
                                     </div>
                                 </div>
-                            </details>
-                        </div>
-                    </div>
 
-                    <!-- ================= KONDISI 4: TIDAK ADA HASIL ================= -->
-                    <div id="panel-kosong" class="hidden flex-col items-center justify-center text-center p-8 lg:p-12 flex-1">
-                        <div class="w-16 h-16 rounded-full bg-secondary/10 text-secondary flex items-center justify-center mb-4">
-                            <span class="material-symbols-outlined text-3xl">search_off</span>
-                        </div>
-                        <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">
-                            Tidak ada destinasi yang cocok
-                        </h3>
-                        <p class="font-body-md text-body-md text-on-surface-variant max-w-md mb-6 leading-relaxed">
-                            Saran: naikkan anggaran maksimal atau tambah jenis wisata agar destinasi yang sesuai dapat ditemukan.
-                        </p>
-                        <button type="button" id="btn-reset-kosong" class="px-6 py-2.5 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm hover:opacity-95 transition-all cursor-pointer">
-                            Reset Anggaran &amp; Cari Ulang
-                        </button>
-                    </div>
+                                <!-- Bobot Ternormalisasi -->
+                                <div class="space-y-2">
+                                    <h3 class="font-title text-title text-on-surface font-semibold">Bobot Ternormalisasi Kriteria</h3>
+                                    <div id="calc-bobot-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                                        <!-- Bobot ternormalisasi dari API -->
+                                    </div>
+                                </div>
 
-                    <!-- ================= KONDISI 5: ERROR ================= -->
-                    <div id="panel-error" class="hidden flex-col items-center justify-center text-center p-8 flex-1">
-                        <div class="w-14 h-14 rounded-full bg-error-container text-on-error-container flex items-center justify-center mb-4">
-                            <span class="material-symbols-outlined text-3xl">error_outline</span>
-                        </div>
-                        <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Terjadi Kesalahan</h3>
-                        <div id="error-pesan" class="font-body-md text-body-md text-error max-w-md mb-6 leading-relaxed">
-                            Tidak dapat menghubungi server, coba lagi.
-                        </div>
-                        <button type="button" onclick="document.getElementById('btn-submit').click();" class="px-5 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors cursor-pointer">
-                            Coba Lagi
-                        </button>
+                                <!-- Tabel Nilai Ideal (f*) dan Terburuk (f-) -->
+                                <div class="space-y-2">
+                                    <h3 class="font-title text-title text-on-surface font-semibold">Nilai Ideal (f*) dan Terburuk (f-)</h3>
+                                    <div class="overflow-x-auto rounded-xl border border-surface-variant/50">
+                                        <table class="w-full text-left text-body-sm border-collapse">
+                                            <thead class="bg-surface-container font-label-md text-label-md text-on-surface">
+                                                <tr>
+                                                    <th class="p-3">Kriteria</th>
+                                                    <th class="p-3">Tipe</th>
+                                                    <th class="p-3">Target Pilihan</th>
+                                                    <th class="p-3 text-primary">Nilai Ideal (f*)</th>
+                                                    <th class="p-3 text-secondary">Nilai Terburuk (f-)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="calc-tabel-ideal" class="divide-y divide-surface-variant/40 bg-surface-container-lowest">
+                                                <!-- Nilai ideal f* dan f- -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Tabel S, R, Q Semua Kandidat -->
+                                <div class="space-y-2">
+                                    <h3 class="font-title text-title text-on-surface font-semibold">Tabel Nilai S, R, dan Q Semua Kandidat</h3>
+                                    <div class="overflow-x-auto rounded-xl border border-surface-variant/50">
+                                        <table class="w-full text-left text-body-sm border-collapse">
+                                            <thead class="bg-surface-container font-label-md text-label-md text-on-surface">
+                                                <tr>
+                                                    <th class="p-3 text-center">Peringkat</th>
+                                                    <th class="p-3">Destinasi</th>
+                                                    <th class="p-3">S (Utilitas)</th>
+                                                    <th class="p-3">R (Penyesalan)</th>
+                                                    <th class="p-3">Q (Kompromi)</th>
+                                                    <th class="p-3">Kecocokan Relatif</th>
+                                                    <th class="p-3">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="calc-tabel-srq" class="divide-y divide-surface-variant/40 bg-surface-container-lowest">
+                                                <!-- Nilai S, R, Q -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
                     </div>
+                </div>
+
+                <!-- ================= KONDISI 4: TIDAK ADA HASIL ================= -->
+                <div id="panel-kosong" class="hidden bg-surface-container-lowest rounded-2xl border border-surface-variant/60 shadow-sm flex-col items-center justify-center text-center p-8 lg:p-12">
+                    <div class="w-16 h-16 rounded-full bg-secondary/10 text-secondary flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-3xl">search_off</span>
+                    </div>
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">
+                        Tidak ada destinasi yang cocok
+                    </h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant max-w-md mb-6 leading-relaxed">
+                        Saran: naikkan anggaran maksimal atau tambah jenis wisata agar destinasi yang sesuai dapat ditemukan.
+                    </p>
+                    <button type="button" id="btn-reset-kosong" class="px-6 py-2.5 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm hover:opacity-95 transition-all cursor-pointer">
+                        Reset Anggaran &amp; Cari Ulang
+                    </button>
+                </div>
+
+                <!-- ================= KONDISI 5: ERROR ================= -->
+                <div id="panel-error" class="hidden bg-surface-container-lowest rounded-2xl border border-error/40 shadow-sm flex-col items-center justify-center text-center p-8">
+                    <div class="w-14 h-14 rounded-full bg-error-container text-on-error-container flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-3xl">error_outline</span>
+                    </div>
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Terjadi Kesalahan</h3>
+                    <div id="error-pesan" class="font-body-md text-body-md text-error max-w-md mb-6 leading-relaxed">
+                        Tidak dapat menghubungi server, coba lagi.
+                    </div>
+                    <button type="button" onclick="document.getElementById('btn-submit').click();" class="px-5 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors cursor-pointer">
+                        Coba Lagi
+                    </button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section Interaktif Mini: Eksplorasi Wilayah Parahyangan (Tanpa angka karangan) -->
+    <!-- Section Interaktif Mini: Eksplorasi Wilayah Parahyangan (rekomendasi.html baris 424) -->
     <section class="w-full bg-surface-container-low py-12">
         <div class="max-w-[1280px] mx-auto px-6 lg:px-12">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -858,8 +942,7 @@
     const barTextBiaya = document.getElementById('bar-text-biaya');
     const barFillBiaya = document.getElementById('bar-fill-biaya');
 
-    // Bobot penting state (default persis rekomendasi.html)
-    // Jarak: 3, Suhu: 2, Keramaian: 2, Fasilitas: 3, Biaya: 1, Rating: 1
+    // Bobot penting state
     const pentingState = {
         jarak: 3,
         suhu: 2,
@@ -870,9 +953,9 @@
     };
 
     let selectedV = 0.5;
-    const selectedJenis = new Set(); // Default: kosong (artinya semua jenis)
+    const selectedJenis = new Set(); // Default: kosong = semua jenis
 
-    // 2. Fungsi Deskripsi Nilai Slider (Salinan dari desain + turunan sistematis)
+    // 2. Fungsi Deskripsi Nilai Slider
     function getDeskripsiJarak(val) {
         if (val <= 50) return `~${val} km (Dekat)`;
         if (val <= 100) return `~${val} km (Sedang)`;
@@ -887,7 +970,7 @@
 
     function getDeskripsiKeramaian(val) {
         if (val <= 20) return 'Sangat Sepi';
-        if (val <= 40) return 'Cenderung Sepi'; // Persis dari desain rekomendasi.html
+        if (val <= 40) return 'Cenderung Sepi';
         if (val <= 60) return 'Sedang';
         if (val <= 80) return 'Cenderung Ramai';
         return 'Sangat Ramai';
@@ -896,7 +979,7 @@
     function getDeskripsiFasilitas(val) {
         if (val <= 25) return 'Sederhana (Dasar)';
         if (val <= 50) return 'Cukup (Toilet & Parkir)';
-        if (val <= 80) return 'Lengkap (Toilet, Shuttle, Parkir)'; // Persis dari desain rekomendasi.html
+        if (val <= 80) return 'Lengkap (Toilet, Shuttle, Parkir)';
         return 'Sangat Lengkap (Fasilitas Penuh)';
     }
 
@@ -906,7 +989,7 @@
 
     function getBadgeAnggaran(val) {
         if (val <= 40000) return 'Sangat Hemat';
-        if (val <= 75000) return 'Ekonomis'; // Persis dari desain
+        if (val <= 75000) return 'Ekonomis';
         if (val <= 120000) return 'Standar';
         return 'Fleksibel';
     }
@@ -941,7 +1024,6 @@
         if (ringkasAsal) ringkasAsal.textContent = kotaAsal;
         if (ringkasAsalHeader) ringkasAsalHeader.textContent = 'Titik Asal: ' + kotaAsal;
 
-        // Jenis wisata text
         if (ringkasJenis) {
             if (selectedJenis.size === 0) {
                 ringkasJenis.textContent = 'Semua Jenis';
@@ -961,7 +1043,6 @@
     }
 
     function updatePrioritasPenilaian() {
-        // Hitung total bobot untuk 5 kriteria form
         const total = pentingState.jarak + pentingState.suhu + pentingState.keramaian + pentingState.fasilitas + pentingState.biaya;
 
         const keys = [
@@ -974,7 +1055,6 @@
 
         keys.forEach(item => {
             const val = pentingState[item.k];
-            // Hindari pembagian dengan nol bila total = 0
             const pct = total > 0 ? Math.round((val / total) * 100) : 0;
             const desc = getLabelTingkatBobot(val);
 
@@ -1076,7 +1156,6 @@
         fFas.value = 80;
         fBiaya.value = 50000;
 
-        // Reset jenis wisata (kosongkan semua)
         selectedJenis.clear();
         chipButtons.forEach(btn => {
             const defaultIkon = btn.getAttribute('data-ikon');
@@ -1085,7 +1164,6 @@
             if (iconEl) iconEl.textContent = defaultIkon;
         });
 
-        // Reset penting ke default desain
         const defaultPenting = { jarak: 3, suhu: 2, keramaian: 2, fasilitas: 3, biaya: 1, rating: 1 };
         Object.assign(pentingState, defaultPenting);
         document.querySelectorAll('[data-penting]').forEach(container => {
@@ -1101,7 +1179,6 @@
             });
         });
 
-        // Reset v ke 0.5
         const cardV05 = document.querySelector('.gaya-card[data-v="0.5"]');
         if (cardV05) cardV05.click();
 
@@ -1132,7 +1209,9 @@
             if (el) {
                 if (s === state) {
                     el.classList.remove('hidden');
-                    el.classList.add('flex');
+                    if (s === 'hasil' || s === 'memuat') {
+                        el.classList.add('flex');
+                    }
                 } else {
                     el.classList.add('hidden');
                     el.classList.remove('flex');
@@ -1145,7 +1224,6 @@
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // Pemetaan kriteria slider 0-100 ke target VIKOR 1-5: 1 + round(nilai / 100 * 4)
         const targetKeramaian = 1 + Math.round((parseInt(fRamai.value, 10) / 100) * 4);
         const targetFasilitas = 1 + Math.round((parseInt(fFas.value, 10) / 100) * 4);
 
@@ -1220,7 +1298,7 @@
         }
     });
 
-    // 10. Render Hasil Sesuai Desain Kompak hasil.html
+    // 10. Render Hasil Sesuai Desain Persis hasil.html
     function renderHasil(data, payload) {
         const urut = data.urut || [];
         const n = Math.min(5, urut.length);
@@ -1247,106 +1325,158 @@
         const topCards = urut.slice(0, n);
         topCards.forEach((item, index) => {
             const cardEl = document.createElement('article');
-            // Kartu kompak flex-1, tinggi sekitar 170-220 px, tidak melebihi 240 px di desktop
-            cardEl.className = 'bg-surface-container-lowest rounded-2xl border border-surface-variant/50 overflow-hidden shadow-[0_2px_12px_rgba(46,125,91,0.06)] hover:shadow-md transition-all duration-200 flex-1 flex flex-col md:flex-row';
-            cardEl.style.minHeight = '170px';
-            cardEl.style.maxHeight = '220px';
-
             const fotoSrc = item.foto ? ('/images/destinasi/' + item.foto) : '/images/placeholder.jpg';
+            const htmFormatted = item.biaya > 0 ? ('HTM Rp ' + Number(item.biaya).toLocaleString('id-ID')) : 'Gratis';
             const isUtama = Boolean(item.utama);
 
-            let rankBadgeHtml = '';
-            const rankTitle = index === 0 ? 'Terbaik' : (index === 1 ? 'Rekomendasi' : 'Alternatif');
-            const rankIcon = index === 0 ? 'workspace_premium' : (index === 1 ? 'military_tech' : '');
-            const rankBg = index === 0 ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container text-on-surface';
-
-            rankBadgeHtml = `
-                <div class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full ${rankBg} font-headline-sm text-[13px] flex items-center gap-1 shadow-md">
-                    ${rankIcon ? `<span class="material-symbols-outlined text-[15px]">${rankIcon}</span>` : ''}
-                    <span>#${item.peringkat} ${rankTitle}</span>
-                </div>
-            `;
-
+            let rankWord = index < 3 ? 'Rekomendasi' : 'Alternatif';
             let alasanHtml = '';
             if (item.alasan && item.alasan.length > 0) {
                 alasanHtml = `
-                    <div class="space-y-0.5 my-1">
+                    <div class="space-y-1.5 pt-1">
                         ${item.alasan.slice(0, 3).map(al => `
-                            <div class="flex items-start gap-1.5 text-xs text-on-surface leading-snug">
-                                <span class="material-symbols-outlined text-primary text-[14px] mt-0.5 flex-shrink-0">check</span>
-                                <span class="truncate">${escapeHtml(al)}</span>
+                            <div class="flex items-start gap-2 font-body-sm text-body-sm text-on-surface">
+                                <span class="material-symbols-outlined text-primary text-[16px] mt-0.5 flex-shrink-0">check_circle</span>
+                                <span>${escapeHtml(al)}</span>
                             </div>
                         `).join('')}
                     </div>
                 `;
             }
 
-            const htmFormatted = item.biaya > 0 ? ('HTM Rp ' + Number(item.biaya).toLocaleString('id-ID')) : 'Gratis';
-
-            cardEl.innerHTML = `
-                <!-- Thumbnail Foto lebar tetap sekitar 176-192 px -->
-                <div class="relative w-full md:w-44 lg:w-48 flex-shrink-0 h-36 md:h-auto overflow-hidden">
-                    <img alt="${escapeHtml(item.nama)}" class="w-full h-full object-cover" src="${fotoSrc}" onerror="this.src='/images/placeholder.jpg'">
-                    ${rankBadgeHtml}
-                </div>
-                <!-- Body Konten -->
-                <div class="p-3.5 md:p-4 flex-1 min-w-0 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0 flex-1">
-                                <div class="flex items-center gap-1.5 text-xs mb-0.5">
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm whitespace-nowrap text-[11px]">${escapeHtml(item.jenis)}</span>
-                                    <span class="text-outline-variant">•</span>
-                                    <span class="text-on-surface-variant truncate text-[12px]">${escapeHtml(item.wilayah)}</span>
+            if (index === 0) {
+                // Kartu #1 (Best Match) - persis hasil.html baris 294
+                cardEl.className = 'bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_12px_28px_-4px_rgba(46,125,91,0.12)] transition-all duration-300';
+                cardEl.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-12">
+                        <!-- Gambar & Floating Badge -->
+                        <div class="relative md:col-span-5 min-h-[220px] md:min-h-full">
+                            <img alt="${escapeHtml(item.nama)}" class="w-full h-full object-cover" src="${fotoSrc}" onerror="this.src='/images/placeholder.jpg'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent md:hidden"></div>
+                            <!-- Badge Peringkat #1 -->
+                            <div class="absolute top-3 left-3 px-3 py-1.5 rounded-full bg-secondary-container text-on-secondary-container font-headline-sm text-headline-sm flex items-center gap-1.5 shadow-md">
+                                <span class="material-symbols-outlined text-[18px]">workspace_premium</span>
+                                <span>#1 Rekomendasi</span>
+                            </div>
+                        </div>
+                        <!-- Content Body -->
+                        <div class="p-5 md:p-6 md:col-span-7 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap">${escapeHtml(item.jenis)}</span>
+                                            <span class="text-outline-variant">•</span>
+                                            <span class="font-body-sm text-body-sm text-on-surface-variant truncate">${escapeHtml(item.wilayah)}</span>
+                                        </div>
+                                        <h3 class="font-headline-md text-headline-md text-on-surface hover:text-primary transition-colors cursor-pointer">
+                                            <a href="/destinasi/${item.id}">${escapeHtml(item.nama)}</a>
+                                        </h3>
+                                    </div>
+                                    <!-- Skor Kompromi -->
+                                    <div class="text-right flex-shrink-0">
+                                        <div class="font-display text-[26px] leading-tight font-extrabold text-primary">${Number(item.persen).toFixed(1)}%</div>
+                                        <span class="font-label-sm text-label-sm text-on-surface-variant">Q: ${Number(item.Q).toFixed(3)}</span>
+                                    </div>
                                 </div>
-                                <h3 class="font-headline-sm text-[16px] md:text-[17px] font-bold text-on-surface hover:text-primary transition-colors cursor-pointer truncate">
-                                    <a href="/destinasi/${item.id}">${escapeHtml(item.nama)}</a>
-                                </h3>
+                                <!-- Quick Spec Pills (Satu baris chip ringkas dengan rating bintang) -->
+                                <div class="flex flex-wrap gap-2 my-3.5">
+                                    <div class="px-2.5 py-1 rounded-lg bg-surface-container font-label-sm text-label-sm text-on-surface flex items-center gap-1.5 whitespace-nowrap">
+                                        <span>${Number(item.jarak).toFixed(1)} km</span>
+                                        <span>•</span>
+                                        <span>${item.suhu}°C</span>
+                                        <span>•</span>
+                                        <span>${htmFormatted}</span>
+                                        <span>•</span>
+                                        <span class="inline-flex items-center gap-0.5 text-secondary font-semibold">
+                                            <span class="material-symbols-outlined text-[15px]">star</span>
+                                            <span>${item.rating}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- Alasan -->
+                                ${alasanHtml}
                             </div>
-                            <div class="text-right flex-shrink-0">
-                                <div class="font-display text-[22px] leading-tight font-extrabold text-primary">${Number(item.persen).toFixed(1)}%</div>
-                                <span class="font-mono text-[11px] text-on-surface-variant font-semibold block" title="Makin kecil makin baik">Q = ${Number(item.Q).toFixed(3)}</span>
+                            <!-- Action Footer -->
+                            <div class="flex items-center justify-between gap-3 pt-4 mt-3 border-t border-surface-variant/40">
+                                <div class="flex items-center gap-2">
+                                    <a href="/destinasi/${item.id}" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg transition-colors flex items-center gap-1.5 shadow-sm">
+                                        <span>Lihat Detail</span>
+                                        <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                                    </a>
+                                    <button class="p-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors cursor-pointer" title="Simpan ke Rencana" type="button">
+                                        <span class="material-symbols-outlined text-[20px]">bookmark</span>
+                                    </button>
+                                </div>
+                                <span class="font-label-sm text-label-sm text-primary font-semibold flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">star</span>
+                                    Rekomendasi Utama
+                                </span>
                             </div>
                         </div>
-
-                        <!-- 4 Chip Spesifikasi -->
-                        <div class="flex flex-wrap items-center gap-1.5 my-1.5 text-[11px]">
-                            <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[13px] text-primary">distance</span>
-                                ${Number(item.jarak).toFixed(1)} km (garis lurus)
-                            </span>
-                            <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[13px] text-primary">device_thermostat</span>
-                                ${item.suhu}°C
-                            </span>
-                            <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[13px] text-secondary">confirmation_number</span>
-                                ${htmFormatted}
-                            </span>
-                            <span class="px-2 py-0.5 rounded bg-surface-container text-on-surface flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[13px] text-secondary">star</span>
-                                ${item.rating}
-                            </span>
+                    </div>
+                `;
+            } else {
+                // Kartu #2, #3, #4, dst - persis hasil.html baris 382
+                cardEl.className = index < 3
+                    ? 'bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_4px_20px_-2px_rgba(46,125,91,0.06)] hover:shadow-[0_12px_28px_-4px_rgba(46,125,91,0.12)] transition-all duration-300'
+                    : 'bg-surface-container-lowest rounded-2xl border border-surface-variant/50 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300';
+                
+                cardEl.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-12">
+                        <div class="relative md:col-span-5 min-h-[190px] md:min-h-full">
+                            <img alt="${escapeHtml(item.nama)}" class="w-full h-full object-cover" src="${fotoSrc}" onerror="this.src='/images/placeholder.jpg'">
+                            <div class="absolute top-3 left-3 px-3 py-1 rounded-full ${index < 3 ? 'bg-surface-container-highest text-on-surface font-title text-title text-[14px]' : 'bg-surface-container text-on-surface font-label-md text-label-md'} flex items-center gap-1 shadow-sm">
+                                ${index < 3 ? '<span class="material-symbols-outlined text-[16px] text-primary">military_tech</span>' : ''}
+                                <span>#${item.peringkat} ${rankWord}</span>
+                            </div>
                         </div>
-
-                        ${alasanHtml}
+                        <div class="p-5 md:p-6 md:col-span-7 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap">${escapeHtml(item.jenis)}</span>
+                                            <span class="text-outline-variant">•</span>
+                                            <span class="font-body-sm text-body-sm text-on-surface-variant truncate">${escapeHtml(item.wilayah)}</span>
+                                        </div>
+                                        <h3 class="font-headline-md text-headline-md text-on-surface hover:text-primary transition-colors cursor-pointer">
+                                            <a href="/destinasi/${item.id}">${escapeHtml(item.nama)}</a>
+                                        </h3>
+                                    </div>
+                                    <div class="text-right flex-shrink-0">
+                                        <div class="font-headline-md text-headline-md font-bold text-primary">${Number(item.persen).toFixed(1)}%</div>
+                                        <span class="font-label-sm text-label-sm text-on-surface-variant">Q: ${Number(item.Q).toFixed(3)}</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2 my-3">
+                                    <div class="px-2.5 py-0.5 rounded-lg bg-surface-container font-label-sm text-label-sm text-on-surface flex items-center gap-1.5 whitespace-nowrap">
+                                        <span>${Number(item.jarak).toFixed(1)} km</span>
+                                        <span>•</span>
+                                        <span>${item.suhu}°C</span>
+                                        <span>•</span>
+                                        <span>${htmFormatted}</span>
+                                        <span>•</span>
+                                        <span class="inline-flex items-center gap-0.5 text-secondary font-semibold">
+                                            <span class="material-symbols-outlined text-[15px]">star</span>
+                                            <span>${item.rating}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                ${alasanHtml}
+                            </div>
+                            <div class="flex items-center justify-between gap-3 pt-3 mt-3 border-t border-surface-variant/40">
+                                <a href="/destinasi/${item.id}" class="px-4 py-1.5 rounded-xl bg-surface-container hover:bg-primary hover:text-on-primary text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1">
+                                    <span>Lihat Detail</span>
+                                    <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+                                </a>
+                                <span class="font-body-sm text-body-sm text-on-surface-variant truncate">${escapeHtml(item.wilayah)}</span>
+                            </div>
+                        </div>
                     </div>
+                `;
+            }
 
-                    <!-- Footer Kartu -->
-                    <div class="flex items-center justify-between gap-2 pt-2 border-t border-surface-variant/40 mt-1">
-                        <a href="/destinasi/${item.id}" class="px-3.5 py-1 rounded-xl bg-surface-container hover:bg-primary hover:text-on-primary text-on-surface font-label-md text-xs transition-colors flex items-center gap-1">
-                            <span>Lihat Detail</span>
-                            <span class="material-symbols-outlined text-[13px]">arrow_forward</span>
-                        </a>
-                        ${isUtama ? `
-                            <span class="font-label-sm text-[11px] text-primary font-semibold flex items-center gap-1 bg-primary/10 px-2 py-0.5 rounded-full">
-                                <span class="material-symbols-outlined text-[13px]">star</span>
-                                Rekomendasi Utama
-                            </span>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
             container.appendChild(cardEl);
         });
 
