@@ -51,6 +51,46 @@ class HalamanTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Katalog Wisata');
         $response->assertSee('Kawah Putih Ciwidey');
+        $response->assertDontSee('Kiat Penjelajah');
+    }
+
+    public function test_halaman_katalog_paginasi_12_destinasi_per_halaman_dan_tanpa_kartu_promo(): void
+    {
+        for ($i = 1; $i <= 14; $i++) {
+            Destinasi::create([
+                'nama' => sprintf('Destinasi Tambahan %02d', $i),
+                'jenis' => 'Pantai',
+                'wilayah' => 'Pangandaran',
+                'lat' => -7.7,
+                'lon' => 108.5,
+                'biaya' => 20000,
+                'rating' => 4.5,
+                'suhu' => 28,
+                'keramaian' => 3,
+                'fasilitas' => 4,
+                'deskripsi' => 'Deskripsi pantai indah.',
+                'foto' => 'pantai.jpg',
+                'sumber' => 'Disparbud',
+                'diperbarui' => '2025-01-01',
+            ]);
+        }
+
+        // Total 15 destinasi (1 di setUp + 14 tambahan)
+        // Halaman 1: 1 - 12
+        $responsePage1 = $this->get('/katalog?page=1');
+        $responsePage1->assertStatus(200);
+        $responsePage1->assertSee('1 - 12');
+        $responsePage1->assertSee('15');
+        $responsePage1->assertSee('destinasi wisata');
+        $responsePage1->assertDontSee('Kiat Penjelajah');
+
+        // Halaman 2: 13 - 15
+        $responsePage2 = $this->get('/katalog?page=2');
+        $responsePage2->assertStatus(200);
+        $responsePage2->assertSee('13 - 15');
+        $responsePage2->assertSee('15');
+        $responsePage2->assertSee('destinasi wisata');
+        $responsePage2->assertDontSee('Kiat Penjelajah');
     }
 
     public function test_halaman_katalog_dengan_filter_jenis_mengembalikan_status_200(): void
@@ -102,18 +142,15 @@ class HalamanTest extends TestCase
         $response->assertDontSee('100.0%');
     }
 
-    public function test_halaman_rekomendasi_memiliki_elemen_modal_hitung_dan_tidak_menggunakan_details(): void
+    public function test_halaman_rekomendasi_tidak_menampilkan_modal_atau_rincian_hitung(): void
     {
         $response = $this->get('/rekomendasi');
 
         $response->assertStatus(200);
-        $response->assertSee('id="modal-hitung"', false);
-        $response->assertSee('id="btn-buka-modal-hitung"', false);
-        $response->assertSee('Cara Menghitung Rekomendasi');
-        $response->assertSee('Bobot Kriteria');
-        $response->assertSee('Tabel Skor (S, R, Q)');
-        $response->assertSee('Uji Hasil');
-        $response->assertSee('Rumus Persen');
+        $response->assertDontSee('id="modal-hitung"', false);
+        $response->assertDontSee('id="btn-buka-modal-hitung"', false);
+        $response->assertDontSee('Cara Menghitung Rekomendasi');
+        $response->assertDontSee('Tabel Skor (S, R, Q)');
         $response->assertDontSee('<details', false);
     }
 }

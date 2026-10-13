@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Destinasi;
+use App\Models\KotaAsal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,7 +29,7 @@ Route::get('/katalog', function (Request $request) {
         $selectedJenis = null;
     }
 
-    $destinasi = $query->orderBy('nama')->paginate(8)->withQueryString();
+    $destinasi = $query->orderBy('nama')->paginate(12)->withQueryString();
     $totalDestinasi = Destinasi::count();
 
     $jenisCounts = Destinasi::selectRaw('jenis, count(*) as count')
@@ -54,12 +55,8 @@ Route::get('/destinasi/{id}', function ($id) {
 })->name('destinasi.show');
 
 Route::get('/rekomendasi', function () {
-    $kotaList = \App\Models\KotaAsal::orderBy('nama')->get();
+    $kotaList = KotaAsal::orderBy('nama')->get();
     $totalAktif = Destinasi::count();
 
     return view('rekomendasi', compact('kotaList', 'totalAktif'));
 })->name('rekomendasi');
-
-
-
-

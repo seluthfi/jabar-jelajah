@@ -16,6 +16,16 @@
 @endphp
 
 @section('content')
+<style>
+.hasil-kartu{display:flex;flex-direction:column;overflow:hidden;min-height:200px}
+.hasil-foto{position:relative;width:100%;height:170px;flex:0 0 auto}
+.hasil-foto img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
+.hasil-isi{flex:1 1 auto;min-width:0}
+@media (min-width:768px){
+  .hasil-kartu{flex-direction:row}
+  .hasil-foto{height:auto;flex:0 0 36%;max-width:220px;min-width:160px}
+}
+</style>
 <div class="flex flex-col w-full">
     <!-- Top Breadcrumb & Page Intro Section -->
     <section class="max-w-[1280px] w-full mx-auto px-6 lg:px-12 pt-6 pb-8">
@@ -695,21 +705,8 @@
                     </div>
 
                     <!-- Daftar Kartu Peringkat (Tinggi Seragam, CSS Grid auto-rows-fr) -->
-                    <div id="hasil-cards-container" class="grid grid-cols-1 auto-rows-fr gap-4 flex-1" style="grid-auto-rows: 1fr;">
+                    <div id="hasil-cards-container" class="grid gap-4 flex-1" style="grid-template-columns:1fr;grid-auto-rows:1fr">
                         <!-- Kartu hasil dirender secara dinamis oleh JavaScript -->
-                    </div>
-
-                    <!-- Tombol Buka Modal Interaktif: "Lihat cara menghitung" (shrink-0) -->
-                    <div class="bg-surface-container-lowest rounded-2xl border border-surface-variant/60 p-4 lg:p-5 shadow-sm shrink-0">
-                        <button id="btn-buka-modal-hitung" type="button" class="w-full flex items-center justify-between font-headline-sm text-headline-sm text-primary hover:text-primary-container transition-colors cursor-pointer" aria-haspopup="dialog" aria-expanded="false">
-                            <span class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-[22px]">calculate</span>
-                                <span>Lihat cara menghitung</span>
-                            </span>
-                            <span class="material-symbols-outlined text-[20px]">
-                                open_in_full
-                            </span>
-                        </button>
                     </div>
                 </div>
 
@@ -812,143 +809,10 @@
         </div>
     </section>
 
-    <!-- ================= MODAL INTERAKTIF: CARA MENGHITUNG ================= -->
-    <div id="modal-hitung" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-sm transition-opacity duration-150 opacity-0 pointer-events-none" role="dialog" aria-modal="true" aria-labelledby="modal-hitung-title" aria-hidden="true">
-        <div id="modal-hitung-panel" class="bg-surface-container-lowest w-full sm:max-w-3xl max-h-[92vh] sm:max-h-[85vh] rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col transform transition-all duration-150 scale-95 sm:scale-95 translate-y-4 sm:translate-y-0 overflow-hidden">
-            <!-- Modal Header (Tetap di atas) -->
-            <div class="p-5 sm:p-6 border-b border-surface-variant/50 shrink-0 bg-surface-container-lowest">
-                <div class="flex items-center justify-between gap-4 mb-4">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-xl bg-primary-container/20 text-primary flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined text-[20px]">calculate</span>
-                        </div>
-                        <div>
-                            <h3 id="modal-hitung-title" class="font-headline-sm text-headline-sm text-on-surface">Cara Menghitung Rekomendasi</h3>
-                            <p class="font-body-sm text-body-sm text-on-surface-variant">Transparansi kompromi multikriteria VIKOR</p>
-                        </div>
-                    </div>
-                    <button id="btn-tutup-modal-hitung" type="button" class="w-9 h-9 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors cursor-pointer" aria-label="Tutup modal">
-                        <span class="material-symbols-outlined text-[20px]">close</span>
-                    </button>
-                </div>
-
-                <!-- Tab Navigasi -->
-                <div role="tablist" aria-label="Kategori Perhitungan" class="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-surface-variant/40">
-                    <button role="tab" id="tab-bobot" data-target="bobot" aria-selected="true" aria-controls="panel-tab-bobot" tabindex="0" class="tab-hitung px-3.5 py-2 rounded-lg text-label-md font-label-md transition-colors whitespace-nowrap cursor-pointer bg-primary text-on-primary font-semibold shadow-xs">
-                        Bobot Kriteria
-                    </button>
-                    <button role="tab" id="tab-srq" data-target="srq" aria-selected="false" aria-controls="panel-tab-srq" tabindex="-1" class="tab-hitung px-3.5 py-2 rounded-lg text-label-md font-label-md transition-colors whitespace-nowrap cursor-pointer text-on-surface-variant hover:bg-surface-container hover:text-on-surface">
-                        Tabel Skor (S, R, Q)
-                    </button>
-                    <button role="tab" id="tab-uji" data-target="uji" aria-selected="false" aria-controls="panel-tab-uji" tabindex="-1" class="tab-hitung px-3.5 py-2 rounded-lg text-label-md font-label-md transition-colors whitespace-nowrap cursor-pointer text-on-surface-variant hover:bg-surface-container hover:text-on-surface">
-                        Uji Hasil
-                    </button>
-                    <button role="tab" id="tab-rumus" data-target="rumus" aria-selected="false" aria-controls="panel-tab-rumus" tabindex="-1" class="tab-hitung px-3.5 py-2 rounded-lg text-label-md font-label-md transition-colors whitespace-nowrap cursor-pointer text-on-surface-variant hover:bg-surface-container hover:text-on-surface">
-                        Rumus Persen
-                    </button>
-                </div>
-            </div>
-
-            <!-- Modal Content (Scrollable di dalam panel) -->
-            <div class="overflow-y-auto p-5 sm:p-6 flex-1 space-y-6 text-on-surface font-body-md text-body-md">
-                <!-- Tab 1: Bobot Kriteria -->
-                <div id="panel-tab-bobot" role="tabpanel" aria-labelledby="tab-bobot" class="tab-panel space-y-6">
-                    <div>
-                        <h4 class="font-title text-title text-on-surface font-semibold mb-2">Bobot Ternormalisasi Kriteria</h4>
-                        <p class="font-body-sm text-body-sm text-on-surface-variant mb-3">Bobot dihitung dari tingkat kepentingan (0 - 3) yang Anda tentukan pada formulir.</p>
-                        <div id="calc-bobot-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                            <!-- Diisi dinamis oleh JavaScript -->
-                        </div>
-                    </div>
-
-                    <div>
-                        <h4 class="font-title text-title text-on-surface font-semibold mb-2">Nilai Ideal (f*) dan Terburuk (f-)</h4>
-                        <p class="font-body-sm text-body-sm text-on-surface-variant mb-3">Titik acuan ideal terbaik dan nilai batas terburuk untuk tiap kriteria pada dataset kandidat.</p>
-                        <div class="overflow-x-auto rounded-xl border border-surface-variant/50">
-                            <table class="w-full text-left text-body-sm border-collapse">
-                                <thead class="bg-surface-container font-label-md text-label-md text-on-surface">
-                                    <tr>
-                                        <th class="p-3">Kriteria</th>
-                                        <th class="p-3">Tipe</th>
-                                        <th class="p-3">Target Pilihan</th>
-                                        <th class="p-3 text-primary">Nilai Ideal (f*)</th>
-                                        <th class="p-3 text-secondary">Nilai Terburuk (f-)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="calc-tabel-ideal" class="divide-y divide-surface-variant/40 bg-surface-container-lowest">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab 2: Tabel Skor (S, R, Q) -->
-                <div id="panel-tab-srq" role="tabpanel" aria-labelledby="tab-srq" class="tab-panel hidden space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="font-title text-title text-on-surface font-semibold">Tabel Nilai S, R, dan Q Semua Kandidat</h4>
-                            <p class="font-body-sm text-body-sm text-on-surface-variant">Klik baris destinasi untuk menyorot kartunya di halaman.</p>
-                        </div>
-                        <span class="font-label-sm text-label-sm text-primary bg-primary/10 px-2 py-0.5 rounded font-bold">Q makin kecil = makin baik</span>
-                    </div>
-                    <div class="overflow-x-auto rounded-xl border border-surface-variant/50">
-                        <table class="w-full text-left text-body-sm border-collapse">
-                            <thead class="bg-surface-container font-label-md text-label-md text-on-surface">
-                                <tr>
-                                    <th class="p-3 text-center">Peringkat</th>
-                                    <th class="p-3">Destinasi</th>
-                                    <th class="p-3">S (Utilitas)</th>
-                                    <th class="p-3">R (Penyesalan)</th>
-                                    <th class="p-3">Q (Kompromi)</th>
-                                    <th class="p-3">Kecocokan Relatif</th>
-                                    <th class="p-3">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="calc-tabel-srq" class="divide-y divide-surface-variant/40 bg-surface-container-lowest">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Tab 3: Uji Hasil -->
-                <div id="panel-tab-uji" role="tabpanel" aria-labelledby="tab-uji" class="tab-panel hidden space-y-4">
-                    <div class="p-4 rounded-xl bg-surface-container-low border border-surface-variant/40 space-y-3">
-                        <h4 class="font-title text-title text-on-surface font-semibold">Hasil Uji Kompromi VIKOR</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-body-sm">
-                            <div class="p-3 rounded-lg bg-surface-container border border-surface-variant/30 space-y-1">
-                                <span class="font-label-sm text-label-sm text-on-surface-variant block">Uji Keunggulan (Acceptable Advantage)</span>
-                                <span id="calc-keunggulan" class="font-semibold text-on-surface block">-</span>
-                                <span id="calc-dq" class="text-xs text-on-surface-variant block font-mono">Batas DQ = 1/(m-1)</span>
-                            </div>
-                            <div class="p-3 rounded-lg bg-surface-container border border-surface-variant/30 space-y-1">
-                                <span class="font-label-sm text-label-sm text-on-surface-variant block">Uji Kestabilan (Acceptable Stability)</span>
-                                <span id="calc-kestabilan" class="font-semibold text-on-surface block">-</span>
-                                <span class="text-xs text-on-surface-variant block">A1 terbaik pada utilitas S atau penyesalan R</span>
-                            </div>
-                        </div>
-                        <div class="pt-2 text-body-sm text-on-surface-variant">
-                            Mode keputusan yang dihasilkan: <strong id="calc-mode-hasil" class="text-primary font-bold">-</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab 4: Rumus Persen -->
-                <div id="panel-tab-rumus" role="tabpanel" aria-labelledby="tab-rumus" class="tab-panel hidden space-y-4">
-                    <div class="p-4 rounded-xl bg-surface-container-low border border-surface-variant/40 space-y-3">
-                        <h4 class="font-title text-title text-on-surface font-semibold">Rumus Kecocokan Relatif (Persen)</h4>
-                        <p class="font-mono text-sm bg-surface-container px-3 py-2 rounded-lg text-primary font-bold inline-block">
-                            persen = round((1 - Q) × 100, 1)
-                        </p>
-                        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-                            Karena nilai indeks kompromi Q dinormalisasi antar kandidat (makin kecil makin baik), persen bersifat <strong>relatif terhadap kandidat saat ini</strong>: kandidat peringkat 1 selalu bernilai 100% dan yang paling bawah 0%.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-</div>
 @endsection
+
+
 
 @push('scripts')
 <script>
@@ -1347,107 +1211,13 @@
         }
     });
 
-    // 10. Modal Perhitungan Elements & Handlers
-    const modalHitung = document.getElementById('modal-hitung');
-    const modalHitungPanel = document.getElementById('modal-hitung-panel');
-    const btnBukaModalHitung = document.getElementById('btn-buka-modal-hitung');
-    const btnTutupModalHitung = document.getElementById('btn-tutup-modal-hitung');
-    const tabsHitung = document.querySelectorAll('.tab-hitung');
-    const tabPanels = document.querySelectorAll('.tab-panel');
 
-    function bukaModal() {
-        if (!modalHitung || !modalHitungPanel) return;
-        modalHitung.classList.remove('opacity-0', 'pointer-events-none');
-        modalHitung.classList.add('opacity-100');
-        modalHitungPanel.classList.remove('scale-95', 'translate-y-4');
-        modalHitungPanel.classList.add('scale-100', 'translate-y-0');
-        modalHitung.setAttribute('aria-hidden', 'false');
-        if (btnBukaModalHitung) btnBukaModalHitung.setAttribute('aria-expanded', 'true');
-        document.body.classList.add('overflow-hidden');
-        if (btnTutupModalHitung) btnTutupModalHitung.focus();
-    }
 
-    function tutupModal() {
-        if (!modalHitung || !modalHitungPanel) return;
-        modalHitung.classList.remove('opacity-100');
-        modalHitung.classList.add('opacity-0', 'pointer-events-none');
-        modalHitungPanel.classList.remove('scale-100', 'translate-y-0');
-        modalHitungPanel.classList.add('scale-95', 'translate-y-4');
-        modalHitung.setAttribute('aria-hidden', 'true');
-        if (btnBukaModalHitung) {
-            btnBukaModalHitung.setAttribute('aria-expanded', 'false');
-            btnBukaModalHitung.focus();
-        }
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    if (btnBukaModalHitung) {
-        btnBukaModalHitung.addEventListener('click', bukaModal);
-    }
-    if (btnTutupModalHitung) {
-        btnTutupModalHitung.addEventListener('click', tutupModal);
-    }
-    if (modalHitung) {
-        modalHitung.addEventListener('click', function(e) {
-            if (e.target === modalHitung) {
-                tutupModal();
-            }
-        });
-    }
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modalHitung && !modalHitung.classList.contains('pointer-events-none')) {
-            tutupModal();
-        }
-    });
-
-    // Tab Navigation Logic (Keyboard & Click)
-    function switchTab(targetTabId) {
-        tabsHitung.forEach(tab => {
-            const isTarget = tab.getAttribute('data-target') === targetTabId;
-            tab.setAttribute('aria-selected', isTarget ? 'true' : 'false');
-            tab.setAttribute('tabindex', isTarget ? '0' : '-1');
-            if (isTarget) {
-                tab.className = 'tab-hitung px-3.5 py-2 rounded-lg text-label-md font-label-md transition-colors whitespace-nowrap cursor-pointer bg-primary text-on-primary font-semibold shadow-xs';
-            } else {
-                tab.className = 'tab-hitung px-3.5 py-2 rounded-lg text-label-md font-label-md transition-colors whitespace-nowrap cursor-pointer text-on-surface-variant hover:bg-surface-container hover:text-on-surface';
-            }
-        });
-
-        tabPanels.forEach(panel => {
-            if (panel.id === 'panel-tab-' + targetTabId) {
-                panel.classList.remove('hidden');
-            } else {
-                panel.classList.add('hidden');
-            }
-        });
-    }
-
-    tabsHitung.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const target = tab.getAttribute('data-target');
-            switchTab(target);
-        });
-
-        tab.addEventListener('keydown', function(e) {
-            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-                e.preventDefault();
-                const tabList = Array.from(tabsHitung);
-                const currentIndex = tabList.indexOf(tab);
-                const nextIndex = e.key === 'ArrowRight'
-                    ? (currentIndex + 1) % tabList.length
-                    : (currentIndex - 1 + tabList.length) % tabList.length;
-                const nextTab = tabList[nextIndex];
-                nextTab.focus();
-                switchTab(nextTab.getAttribute('data-target'));
-            }
-        });
-    });
-
-    // 11. Render Hasil: Semua 5 Kartu Seragam Template Seperti #4 Situ Cileunca
+    // 11. Render Hasil: Semua 4 Kartu Seragam Template Seperti #4 Situ Cileunca
     function renderHasil(data, payload) {
         const urut = data.urut || [];
-        // Tampilkan min(5, jumlah hasil)
-        const n = Math.min(5, urut.length);
+        // Tampilkan min(4, jumlah hasil)
+        const n = Math.min(4, urut.length);
 
         document.getElementById('hasil-jumlah-top').textContent = n;
         document.getElementById('hasil-subteks').textContent = `Menampilkan ${n} teratas dari ${data.jumlahKandidat} destinasi • Berdasarkan keberangkatan ${data.asal}`;
@@ -1472,7 +1242,7 @@
         topCards.forEach((item, index) => {
             const cardEl = document.createElement('article');
             cardEl.id = 'card-hasil-' + item.id;
-            cardEl.className = 'bg-surface-container-lowest rounded-2xl border border-surface-variant/50 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col md:flex-row h-full';
+            cardEl.className = 'hasil-kartu bg-surface-container-lowest rounded-2xl border border-surface-variant/50 shadow-sm hover:shadow-md transition-all duration-300';
 
             const fotoSrc = item.foto ? ('/images/destinasi/' + item.foto) : '/images/placeholder.jpg';
             const htmFormatted = item.biaya > 0 ? ('HTM Rp ' + Number(item.biaya).toLocaleString('id-ID')) : 'Gratis';
@@ -1511,9 +1281,9 @@
             }
 
             cardEl.innerHTML = `
-                <!-- Foto di kiri selebar ~40% kartu, object-cover, tinggi penuh -->
-                <div class="relative w-full md:w-[40%] md:shrink-0 min-h-[160px] md:min-h-0">
-                    <img alt="${escapeHtml(item.nama)}" class="absolute inset-0 w-full h-full object-cover rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl" src="${fotoSrc}" onerror="this.src='/images/placeholder.jpg'">
+                <!-- Foto di kiri selebar ~36% kartu (max 220px) pada desktop, tinggi 170px pada mobile -->
+                <div class="hasil-foto">
+                    <img alt="${escapeHtml(item.nama)}" class="object-cover" src="${fotoSrc}" onerror="this.src='/images/placeholder.jpg'">
                     <div class="absolute top-3 left-3 px-3 py-1 rounded-full ${badgeBgClass} flex items-center gap-1.5 shadow-sm">
                         ${badgeIconHtml}
                         <span>${badgeText}</span>
@@ -1521,7 +1291,7 @@
                 </div>
 
                 <!-- Konten di kanan -->
-                <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between min-w-0">
+                <div class="hasil-isi p-4 sm:p-5 flex flex-col justify-between">
                     <div>
                         <!-- Baris Atas: Badge jenis (whitespace-nowrap shrink-0) + wilayah (truncate) & Skor persen + Q -->
                         <div class="flex items-start justify-between gap-3">
@@ -1581,134 +1351,9 @@
 
             container.appendChild(cardEl);
         });
-
-        renderKalkulasiDetails(data, payload, topCards);
     }
 
-    function renderKalkulasiDetails(data, payload, topCards) {
-        const dqVal = Number(data.DQ || 0).toFixed(4);
-        document.getElementById('calc-dq').textContent = `Batas DQ = 1/(m-1) = ${dqVal}`;
-        document.getElementById('calc-keunggulan').textContent = data.keunggulan
-            ? 'Terpenuhi (Keunggulan C1 terpenuhi)'
-            : 'Tidak Terpenuhi (Selisih Q < DQ)';
-        document.getElementById('calc-kestabilan').textContent = data.kestabilan
-            ? 'Terpenuhi (Kestabilan C2 terpenuhi)'
-            : 'Tidak Terpenuhi';
-        document.getElementById('calc-mode-hasil').textContent = data.mode;
 
-        // Bobot Ternormalisasi
-        const bobotContainer = document.getElementById('calc-bobot-container');
-        bobotContainer.innerHTML = '';
-        if (data.bobotTernormalisasi) {
-            Object.entries(data.bobotTernormalisasi).forEach(([key, val]) => {
-                const box = document.createElement('div');
-                box.className = 'p-3 rounded-lg bg-surface-container border border-surface-variant/30 flex items-center justify-between';
-                box.innerHTML = `
-                    <span class="capitalize text-xs font-medium">${escapeHtml(key)}</span>
-                    <span class="font-mono text-sm font-bold text-primary">${(Number(val) * 100).toFixed(1)}%</span>
-                `;
-                bobotContainer.appendChild(box);
-            });
-        }
-
-        // Tabel Nilai Ideal & Terburuk
-        const idealTbody = document.getElementById('calc-tabel-ideal');
-        idealTbody.innerHTML = '';
-        const urut = data.urut || [];
-
-        const kriteriaMeta = [
-            { key: 'biaya', nama: 'Biaya', tipe: 'cost', target: '-' },
-            { key: 'rating', nama: 'Rating', tipe: 'benefit', target: '-' },
-            { key: 'jarak', nama: 'Jarak', tipe: 'target', target: payload.target.jarak + ' km' },
-            { key: 'suhu', nama: 'Suhu', tipe: 'target', target: payload.target.suhu + '°C' },
-            { key: 'keramaian', nama: 'Keramaian', tipe: 'target', target: getDeskripsiKeramaian(fRamai.value) },
-            { key: 'fasilitas', nama: 'Fasilitas', tipe: 'target', target: getDeskripsiFasilitas(fFas.value) },
-        ];
-
-        kriteriaMeta.forEach(k => {
-            let fBest = '-';
-            let fWorst = '-';
-
-            if (urut.length > 0) {
-                if (k.key === 'biaya') {
-                    const vals = urut.map(u => u.biaya);
-                    fBest = 'Rp ' + Math.min(...vals).toLocaleString('id-ID');
-                    fWorst = 'Rp ' + Math.max(...vals).toLocaleString('id-ID');
-                } else if (k.key === 'rating') {
-                    const vals = urut.map(u => u.rating);
-                    fBest = Math.max(...vals).toFixed(1);
-                    fWorst = Math.min(...vals).toFixed(1);
-                } else if (k.key === 'jarak') {
-                    const diffs = urut.map(u => Math.abs(u.jarak - payload.target.jarak));
-                    fBest = 'Selisih ' + Math.min(...diffs).toFixed(1) + ' km';
-                    fWorst = 'Selisih ' + Math.max(...diffs).toFixed(1) + ' km';
-                } else if (k.key === 'suhu') {
-                    const diffs = urut.map(u => Math.abs(u.suhu - payload.target.suhu));
-                    fBest = 'Selisih ' + Math.min(...diffs) + '°C';
-                    fWorst = 'Selisih ' + Math.max(...diffs) + '°C';
-                } else if (k.key === 'keramaian') {
-                    const diffs = urut.map(u => Math.abs(u.keramaian - payload.target.keramaian));
-                    fBest = 'Selisih ' + Math.min(...diffs);
-                    fWorst = 'Selisih ' + Math.max(...diffs);
-                } else if (k.key === 'fasilitas') {
-                    const diffs = urut.map(u => Math.abs(u.fasilitas - payload.target.fasilitas));
-                    fBest = 'Selisih ' + Math.min(...diffs);
-                    fWorst = 'Selisih ' + Math.max(...diffs);
-                }
-            }
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="p-3 font-medium text-on-surface">${escapeHtml(k.nama)}</td>
-                <td class="p-3 font-mono text-xs text-on-surface-variant uppercase">${escapeHtml(k.tipe)}</td>
-                <td class="p-3 text-xs text-on-surface-variant">${escapeHtml(k.target)}</td>
-                <td class="p-3 font-mono text-primary font-bold">${escapeHtml(fBest)}</td>
-                <td class="p-3 font-mono text-secondary">${escapeHtml(fWorst)}</td>
-            `;
-            idealTbody.appendChild(tr);
-        });
-
-        // Tabel Nilai S, R, Q
-        const srqTbody = document.getElementById('calc-tabel-srq');
-        srqTbody.innerHTML = '';
-        const topIds = new Set((topCards || []).map(c => c.id));
-
-        urut.forEach(item => {
-            const tr = document.createElement('tr');
-            const isTop = topIds.has(item.id);
-            tr.className = 'transition-colors hover:bg-primary/5 cursor-pointer ' + (item.utama ? 'bg-primary/5 font-medium' : '');
-            tr.title = 'Klik untuk melihat kartu destinasi ini';
-            tr.innerHTML = `
-                <td class="p-3 text-center font-bold">#${item.peringkat}</td>
-                <td class="p-3 text-on-surface font-medium hover:text-primary transition-colors flex items-center gap-1.5">
-                    <span>${escapeHtml(item.nama)}</span>
-                    ${isTop ? '<span class="material-symbols-outlined text-primary text-[15px]" title="Tampil di kartu">visibility</span>' : ''}
-                </td>
-                <td class="p-3 font-mono">${Number(item.S).toFixed(4)}</td>
-                <td class="p-3 font-mono">${Number(item.R).toFixed(4)}</td>
-                <td class="p-3 font-mono font-bold text-primary">${Number(item.Q).toFixed(4)}</td>
-                <td class="p-3 font-bold text-primary">${Number(item.persen).toFixed(1)}%</td>
-                <td class="p-3 whitespace-nowrap">
-                    ${isTop ? '<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mr-1">Tampil di Kartu</span>' : ''}
-                    ${item.utama ? '<span class="px-2 py-0.5 rounded bg-primary text-on-primary text-xs font-bold">Utama</span>' : '<span class="text-xs text-on-surface-variant">Alternatif</span>'}
-                </td>
-            `;
-
-            tr.addEventListener('click', () => {
-                tutupModal();
-                const targetCard = document.getElementById('card-hasil-' + item.id);
-                if (targetCard) {
-                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    targetCard.classList.add('ring-2', 'ring-primary', 'shadow-lg');
-                    setTimeout(() => {
-                        targetCard.classList.remove('ring-2', 'ring-primary', 'shadow-lg');
-                    }, 2000);
-                }
-            });
-
-            srqTbody.appendChild(tr);
-        });
-    }
 
     function escapeHtml(text) {
         if (!text) return '';

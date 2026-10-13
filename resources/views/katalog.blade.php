@@ -143,36 +143,6 @@
                     </a>
                 </div>
             @endforelse
-
-            <!-- Editorial Card: Rekomendasi Musim Hujan / Panduan (Ditampilkan di Halaman 1 atau Semua Kategori) -->
-            @if ($destinasi->currentPage() == 1 && $destinasi->isNotEmpty())
-                <article class="group flex flex-col justify-between bg-primary text-on-primary rounded-2xl p-8 relative overflow-hidden shadow-[0_12px_28px_-4px_rgba(46,125,91,0.18)]">
-                    <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-primary-fixed/10 rounded-full blur-xl pointer-events-none"></div>
-                    <div class="relative z-10">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-container/80 text-on-primary font-label-sm text-label-sm uppercase tracking-wider mb-6">
-                            <span class="material-symbols-outlined text-[14px]">tips_and_updates</span>
-                            Kiat Penjelajah
-                        </span>
-                        <h2 class="font-headline-sm text-headline-sm text-on-primary leading-snug mb-3">
-                            Butuh Rencana Perjalanan Wisata Pasundan?
-                        </h2>
-                        <p class="font-body-md text-body-md text-on-primary-container/90">
-                            Dapatkan rekomendasi destinasi otomatis dengan algoritma cerdas sesuai jarak, suhu, keramaian, dan anggaranmu.
-                        </p>
-                    </div>
-                    <div class="relative z-10 pt-8 mt-6 border-t border-primary-container/60 flex items-center justify-between">
-                        <div class="flex -space-x-2 overflow-hidden">
-                            <div class="inline-block h-8 w-8 rounded-full ring-2 ring-primary bg-secondary-container flex items-center justify-center text-on-secondary-container font-label-sm text-label-sm">BD</div>
-                            <div class="inline-block h-8 w-8 rounded-full ring-2 ring-primary bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed font-label-sm text-label-sm">GT</div>
-                            <div class="inline-block h-8 w-8 rounded-full ring-2 ring-primary bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-label-sm text-label-sm">SK</div>
-                        </div>
-                        <a class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-secondary-container text-on-secondary-container font-label-md text-label-md hover:bg-secondary hover:text-on-secondary transition-colors shadow-sm" href="{{ url('/rekomendasi') }}">
-                            <span>Cari Rekomendasi</span>
-                            <span class="material-symbols-outlined text-[16px]">map</span>
-                        </a>
-                    </div>
-                </article>
-            @endif
         </section>
 
         <!-- 4. Navigasi Pagination -->
@@ -228,7 +198,7 @@
         @elseif ($destinasi->total() > 0)
             <div class="mt-16 pt-8 flex items-center justify-between border-t border-surface-container-highest">
                 <p class="font-body-md text-body-md text-on-surface-variant">
-                    Menampilkan <span class="font-title text-title text-on-surface">1 - {{ $destinasi->total() }}</span> dari <span class="font-title text-title text-on-surface">{{ $destinasi->total() }}</span> destinasi wisata
+                    Menampilkan <span class="font-title text-title text-on-surface">{{ $destinasi->firstItem() }} - {{ $destinasi->lastItem() }}</span> dari <span class="font-title text-title text-on-surface">{{ $destinasi->total() }}</span> destinasi wisata
                 </p>
             </div>
         @endif

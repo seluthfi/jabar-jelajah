@@ -220,7 +220,7 @@ Nilai selain 0.2 / 0.5 / 0.8 tidak dipakai di antarmuka. Desain Stitch yang mema
 ### 6.2 Skor yang ditampilkan
 
 - Di VIKOR, **Q lebih kecil berarti lebih baik**. Tampilkan Q dengan keterangan "makin kecil makin baik".
-- Persen kecocokan: `persen = round((1 − Q) × 100, 1)`, dihitung di controller, bukan di `Vikor.php`. Beri label "Kecocokan relatif" dan tulis rumusnya di bagian "Lihat cara menghitung".
+- Persen kecocokan: `persen = round((1 − Q) × 100, 1)`, dihitung di controller, bukan di `Vikor.php`. Beri label "Kecocokan relatif".
 - Karena Q dinormalisasi antar kandidat, persen bersifat **relatif terhadap kandidat saat ini**: peringkat 1 selalu 100% dan yang terburuk 0%. Jangan menyebutnya "akurasi" atau "peluang".
 - Jangan menampilkan persen rekaan atau angka yang tidak berasal dari respons API.
 
@@ -244,8 +244,7 @@ Saat halaman dibuka, tampilkan kondisi 1. Data destinasi populer diambil dari da
   - `setara` → "Beberapa pilihan setara" (tandai semua `utama`)
   - `dua_teratas` → "Dua pilihan teratas" (tandai A1 dan A2)
 - Tiap kartu: peringkat, foto, nama, jenis, wilayah, `persen` dan Q, jarak "{jarak} km (garis lurus)", suhu, biaya, `alasan`. Tandai "Rekomendasi Utama" bila `utama = true`.
-- Jangan menampilkan estimasi waktu tempuh (jam). Sistem tidak menghitungnya.
-- Bagian "Lihat cara menghitung" (dapat dibuka): bobot ternormalisasi, nilai ideal dan terburuk tiap kriteria, tabel S, R, Q semua kandidat, rumus persen, dan hasil uji keunggulan dan kestabilan.
+- Keputusan pengguna: UI hanya menampilkan hasil rekomendasi; rincian perhitungan tidak ditampilkan.
 
 ### 6.5 Alasan (`AlasanBuilder`)
 
@@ -271,7 +270,7 @@ Saat halaman dibuka, tampilkan kondisi 1. Data destinasi populer diambil dari da
 Ikuti `prototipe/stitch/` untuk tampilan dan gaya. **Data dan teks contoh di dalam desain Stitch diabaikan**; semua isi dari database.
 
 - Beranda: 4 kartu destinasi populer = 4 destinasi dengan `rating` tertinggi dari database.
-- Katalog: hanya tampilan. Data dari database dengan pagination dan filter jenis lewat query string. Kartu mengarah ke `/destinasi/{id}`. Tidak ada VIKOR di halaman ini.
+- Katalog: hanya tampilan. Data dari database dengan pagination (jumlah per halaman = 12; tidak ada kartu promo) dan filter jenis lewat query string. Kartu mengarah ke `/destinasi/{id}`. Tidak ada VIKOR di halaman ini.
 - Detail (`/destinasi/{id}`): semua teks dan angka dari kolom database. Kartu "Pesona Keindahan Alam" dan "Informasi & Tarif" sejajar: grid 3:2, `items-stretch`, padding dan gap sama, blok "Daya Tarik Utama" didorong ke dasar kartu kiri (`mt-auto`). Kolom yang tidak ada di database (ulasan, jam buka, tips) **tidak ditampilkan**.
 - Foto: `asset('images/destinasi/' . $destinasi->foto)`. Jika `foto` kosong atau file tidak ada, pakai `images/placeholder.jpg`.
 - Font memakai Poppins (bukan serif).
