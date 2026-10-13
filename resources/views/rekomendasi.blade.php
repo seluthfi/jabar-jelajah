@@ -698,9 +698,6 @@
                                 <span class="material-symbols-outlined text-[14px]">verified</span>
                                 <span>Satu pilihan terbaik</span>
                             </span>
-                            <button class="p-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" title="Bagikan Hasil" type="button">
-                                <span class="material-symbols-outlined text-[18px]">share</span>
-                            </button>
                         </div>
                     </div>
 
@@ -1247,21 +1244,23 @@
             const fotoSrc = item.foto ? ('/images/destinasi/' + item.foto) : '/images/placeholder.jpg';
             const htmFormatted = item.biaya > 0 ? ('HTM Rp ' + Number(item.biaya).toLocaleString('id-ID')) : 'Gratis';
             const isUtama = Boolean(item.utama);
+            const ikonDasar = "font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;font-size:16px;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;display:inline-block;font-feature-settings:'liga';-webkit-font-feature-settings:'liga';";
 
-            let badgeBgClass = '';
+            let badgeBgClass = 'font-label-md text-label-md';
+            let badgeStyle = '';
             let badgeIconHtml = '';
             let badgeText = '';
 
             if (index === 0) {
-                badgeBgClass = 'bg-[#f29b38] text-white font-semibold font-label-md text-label-md';
-                badgeIconHtml = '<span class="material-symbols-outlined text-[16px]">workspace_premium</span>';
+                badgeStyle = 'background:#f29b38;color:#ffffff;font-weight:600;';
+                badgeIconHtml = `<span class="material-symbols-outlined" style="${ikonDasar}color:#ffffff;">workspace_premium</span>`;
                 badgeText = '#1 Rekomendasi';
             } else if (index < 3) {
-                badgeBgClass = 'bg-surface-container-highest text-on-surface font-medium font-label-md text-label-md';
-                badgeIconHtml = '<span class="material-symbols-outlined text-[16px] text-primary">military_tech</span>';
+                badgeStyle = 'background:#ffffff;color:#1a1c1e;font-weight:500;';
+                badgeIconHtml = `<span class="material-symbols-outlined" style="${ikonDasar}color:#2e7d5b;">military_tech</span>`;
                 badgeText = '#' + item.peringkat + ' Rekomendasi';
             } else {
-                badgeBgClass = 'bg-surface-container text-on-surface font-label-md text-label-md';
+                badgeStyle = 'background:#ffffff;color:#1a1c1e;font-weight:500;';
                 badgeIconHtml = '';
                 badgeText = '#' + item.peringkat + ' Alternatif';
             }
@@ -1284,8 +1283,7 @@
                 <!-- Foto di kiri selebar ~36% kartu (max 220px) pada desktop, tinggi 170px pada mobile -->
                 <div class="hasil-foto">
                     <img alt="${escapeHtml(item.nama)}" class="object-cover" src="${fotoSrc}" onerror="this.src='/images/placeholder.jpg'">
-                    <div class="absolute top-3 left-3 px-3 py-1 rounded-full ${badgeBgClass} flex items-center gap-1.5 shadow-sm">
-                        ${badgeIconHtml}
+                    <div class="absolute top-3 left-3 px-3 py-1 rounded-full ${badgeBgClass} flex items-center gap-1.5 shadow-sm" style="${badgeStyle}">
                         <span>${badgeText}</span>
                     </div>
                 </div>
@@ -1307,7 +1305,6 @@
                             </div>
                             <div class="text-right shrink-0">
                                 <div class="font-headline-md text-headline-md font-bold text-primary leading-tight">${Number(item.persen).toFixed(1)}%</div>
-                                <span class="font-label-sm text-label-sm text-on-surface-variant">Q: ${Number(item.Q).toFixed(3)}</span>
                             </div>
                         </div>
 

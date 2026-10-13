@@ -13,10 +13,6 @@
         </div>
         <div class="flex items-center gap-4">
             <a class="hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-secondary-container hover:bg-secondary text-on-secondary-container hover:text-on-secondary font-label-lg text-label-lg transition-all duration-200 shadow-sm" data-path="cari-rekomendasi" href="{{ url('/rekomendasi') }}">Cari Wisata</a>
-            <a class="inline-flex items-center justify-center px-4 py-2 rounded-full font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="masuk" href="#">Masuk</a>
-            <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
-            </div>
         </div>
     </div>
 </header>

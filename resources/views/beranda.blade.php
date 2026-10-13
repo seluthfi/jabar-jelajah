@@ -36,13 +36,13 @@
             <div class="inline-flex flex-wrap items-center justify-center gap-6 sm:gap-10 py-3.5 px-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-md shadow-sm">
                 <div class="flex items-center gap-2.5">
                     <span class="material-symbols-outlined text-primary text-[20px]">landscape</span>
-                    <span class="font-label-lg text-label-lg text-on-surface font-bold">120+</span>
+                    <span class="font-label-lg text-label-lg text-on-surface font-bold">25++</span>
                     <span class="font-body-sm text-body-sm text-on-surface-variant">Destinasi Terkurasi</span>
                 </div>
                 <div class="w-1.5 h-1.5 rounded-full bg-outline-variant hidden sm:block"></div>
                 <div class="flex items-center gap-2.5">
                     <span class="material-symbols-outlined text-secondary text-[20px]">map</span>
-                    <span class="font-label-lg text-label-lg text-on-surface font-bold">27</span>
+                    <span class="font-label-lg text-label-lg text-on-surface font-bold">10+</span>
                     <span class="font-body-sm text-body-sm text-on-surface-variant">Kota & Kabupaten</span>
                 </div>
                 <div class="w-1.5 h-1.5 rounded-full bg-outline-variant hidden sm:block"></div>
