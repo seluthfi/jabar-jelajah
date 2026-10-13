@@ -2,7 +2,7 @@
     <div class="h-20 max-w-[1280px] mx-auto px-6 lg:px-12 flex items-center justify-between">
         <div class="flex items-center gap-8">
             <a class="flex items-center gap-3 group" data-path="beranda" href="{{ url('/') }}">
-                <img alt="Logo Jelajah Jabar" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VL__g4nFEBwK8OtcR9cNUwNZIkvG40xWAq58buktvunw8r2gDjwpfB_B3q8N1Bupb5rK_mbjTtpcaT9hFvTdEfmYLYynwwYYp1oNPfZpcWqaDrcSrnJkqrzam-n9Wv9yCcgbBAtYxpF-1rT3zi8990HFg8xZBgvnNOpy3m0-S9Kf3vzfcumwkGLlgXGJ8tDzfvRLtIsexCTj6A2h2jmKdn_OFwmgFfQ3kgatvlOzbO1xpneZP6OHRm"/>
+                <img alt="Logo Jelajah Jabar" class="h-8 w-auto object-contain" src="{{ asset('images/Jelajah Jabar Mosque Train Logo.png') }}"/>
                 <span class="font-headline-sm text-headline-sm text-primary tracking-tight">Jelajah Jabar</span>
             </a>
             <nav class="hidden md:flex items-center gap-2" data-active-classes="bg-primary-container text-on-primary font-label-lg text-label-lg rounded-full px-4 py-2">
