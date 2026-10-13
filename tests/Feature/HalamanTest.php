@@ -67,7 +67,7 @@ class HalamanTest extends TestCase
 
     public function test_halaman_detail_destinasi_dengan_id_valid_mengembalikan_status_200(): void
     {
-        $response = $this->get('/destinasi/' . $this->destinasi->id);
+        $response = $this->get('/destinasi/'.$this->destinasi->id);
 
         $response->assertStatus(200);
         $response->assertSee('Kawah Putih Ciwidey');
@@ -101,5 +101,19 @@ class HalamanTest extends TestCase
         $response->assertDontSee('Q = 0.');
         $response->assertDontSee('100.0%');
     }
-}
 
+    public function test_halaman_rekomendasi_memiliki_elemen_modal_hitung_dan_tidak_menggunakan_details(): void
+    {
+        $response = $this->get('/rekomendasi');
+
+        $response->assertStatus(200);
+        $response->assertSee('id="modal-hitung"', false);
+        $response->assertSee('id="btn-buka-modal-hitung"', false);
+        $response->assertSee('Cara Menghitung Rekomendasi');
+        $response->assertSee('Bobot Kriteria');
+        $response->assertSee('Tabel Skor (S, R, Q)');
+        $response->assertSee('Uji Hasil');
+        $response->assertSee('Rumus Persen');
+        $response->assertDontSee('<details', false);
+    }
+}
