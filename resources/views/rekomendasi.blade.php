@@ -1268,8 +1268,8 @@
     // 11. Render Hasil: Semua 5 Kartu Seragam Template Seperti #4 Situ Cileunca
     function renderHasil(data, payload) {
         const urut = data.urut || [];
-        // Tampilkan min(5, jumlah hasil)
-        const n = Math.min(5, urut.length);
+        // Tampilkan min(4, jumlah hasil)
+        const n = Math.min(4, urut.length);
 
         document.getElementById('hasil-jumlah-top').textContent = n;
         document.getElementById('hasil-subteks').textContent = `Menampilkan ${n} teratas dari ${data.jumlahKandidat} destinasi • Berdasarkan keberangkatan ${data.asal}`;
