@@ -70,7 +70,7 @@
                             </div>
                         </div>
                         <button id="btn-reset" class="text-on-surface-variant hover:text-primary p-2 rounded-lg hover:bg-surface-container transition-colors cursor-pointer" title="Reset Default" type="button">
-                            <span class="material-symbols-outlined text-[20px]">refresh</span>
+                            <span class="material-symbols-outlined text-[20px] inline-block">refresh</span>
                         </button>
                     </div>
 
@@ -116,8 +116,8 @@
                                         ];
                                     @endphp
                                     @foreach($kategoriDaftar as $kat)
-                                        <button type="button" data-val="{{ $kat['nama'] }}" data-ikon="{{ $kat['ikon'] }}" class="chip-jenis px-3.5 py-1.5 rounded-full text-label-md font-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors flex items-center gap-1.5 cursor-pointer">
-                                            <span class="material-symbols-outlined text-[15px] chip-icon">{{ $kat['ikon'] }}</span>
+                                        <button type="button" data-val="{{ $kat['nama'] }}" data-ikon="{{ $kat['ikon'] }}" class="chip-jenis px-3.5 py-1.5 rounded-full text-label-md font-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                                            <span class="material-symbols-outlined text-[15px] w-4 h-4 inline-flex items-center justify-center shrink-0 chip-icon">{{ $kat['ikon'] }}</span>
                                             <span>{{ $kat['nama'] }}</span>
                                         </button>
                                     @endforeach
@@ -284,7 +284,7 @@
 
                         <!-- (j) Tombol Utama & Footer Kiri (mt-auto) -->
                         <div class="mt-auto pt-6 space-y-2">
-                            <button id="btn-submit" class="w-full py-4 px-6 rounded-xl bg-secondary-container hover:bg-secondary text-on-secondary-container hover:text-on-secondary font-headline-sm text-headline-sm transition-all duration-200 flex items-center justify-center gap-3 shadow-[0_8px_20px_rgba(242,155,56,0.25)] active:scale-[0.99] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed" type="submit">
+                            <button id="btn-submit" class="w-full py-4 px-6 rounded-xl bg-secondary-container hover:bg-secondary text-on-secondary-container hover:text-on-secondary font-headline-sm text-headline-sm transition-all duration-200 flex items-center justify-center gap-3 shadow-[0_8px_20px_rgba(242,155,56,0.25)] active:scale-[0.98] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed" type="submit">
                                 <span class="material-symbols-outlined text-[24px]">explore</span>
                                 <span id="btn-submit-text">Tampilkan Rekomendasi</span>
                             </button>
@@ -983,6 +983,21 @@
     });
     fAsal.addEventListener('change', updateAllReadouts);
 
+    // Animasi bump pada badge saat slider dilepas (event 'change')
+    [
+        { slider: fJarak, badge: oJarak },
+        { slider: fSuhu, badge: oSuhu },
+        { slider: fRamai, badge: oRamai },
+        { slider: fFas, badge: oFas },
+        { slider: fBiaya, badge: oBiaya },
+    ].forEach(({ slider, badge }) => {
+        slider.addEventListener('change', () => {
+            if (window.JJ && typeof window.JJ.bump === 'function') {
+                window.JJ.bump(badge);
+            }
+        });
+    });
+
     // 4. Chip Jenis Wisata
     const chipButtons = document.querySelectorAll('.chip-jenis');
     chipButtons.forEach(btn => {
@@ -993,11 +1008,11 @@
 
             if (selectedJenis.has(val)) {
                 selectedJenis.delete(val);
-                btn.className = 'chip-jenis px-3.5 py-1.5 rounded-full text-label-md font-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors flex items-center gap-1.5 cursor-pointer';
+                btn.className = 'chip-jenis px-3.5 py-1.5 rounded-full text-label-md font-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors active:scale-95 flex items-center gap-1.5 cursor-pointer';
                 if (iconEl) iconEl.textContent = defaultIkon;
             } else {
                 selectedJenis.add(val);
-                btn.className = 'chip-jenis px-3.5 py-1.5 rounded-full text-label-md font-label-md bg-primary text-on-primary shadow-sm flex items-center gap-1.5 cursor-pointer';
+                btn.className = 'chip-jenis px-3.5 py-1.5 rounded-full text-label-md font-label-md bg-primary text-on-primary shadow-sm transition-colors active:scale-95 flex items-center gap-1.5 cursor-pointer';
                 if (iconEl) iconEl.textContent = 'check';
             }
             updateAllReadouts();
@@ -1011,6 +1026,9 @@
 
         buttons.forEach(btn => {
             btn.addEventListener('click', () => {
+                if (window.JJ && typeof window.JJ.bump === 'function') {
+                    window.JJ.bump(btn);
+                }
                 const val = parseInt(btn.getAttribute('data-val'), 10);
                 pentingState[key] = val;
 
@@ -1070,7 +1088,7 @@
         chipButtons.forEach(btn => {
             const defaultIkon = btn.getAttribute('data-ikon');
             const iconEl = btn.querySelector('.chip-icon');
-            btn.className = 'chip-jenis px-3.5 py-1.5 rounded-full text-label-md font-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors flex items-center gap-1.5 cursor-pointer';
+            btn.className = 'chip-jenis px-3.5 py-1.5 rounded-full text-label-md font-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors active:scale-95 flex items-center gap-1.5 cursor-pointer';
             if (iconEl) iconEl.textContent = defaultIkon;
         });
 
@@ -1096,7 +1114,19 @@
         switchPanel('awal');
     }
 
-    btnReset.addEventListener('click', resetFormToDefault);
+    const resetIcon = btnReset.querySelector('.material-symbols-outlined');
+    btnReset.addEventListener('click', () => {
+        if (resetIcon) {
+            resetIcon.classList.remove('anim-spin-once');
+            void resetIcon.offsetWidth;
+            resetIcon.classList.add('anim-spin-once');
+            resetIcon.addEventListener('animationend', () => {
+                resetIcon.classList.remove('anim-spin-once');
+            }, { once: true });
+        }
+        resetFormToDefault();
+    });
+
     if (btnResetKosong) {
         btnResetKosong.addEventListener('click', () => {
             fBiaya.value = 150000;
@@ -1104,7 +1134,7 @@
             chipButtons.forEach(btn => {
                 const defaultIkon = btn.getAttribute('data-ikon');
                 const iconEl = btn.querySelector('.chip-icon');
-                btn.className = 'chip-jenis px-3.5 py-1.5 rounded-full text-label-md font-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors flex items-center gap-1.5 cursor-pointer';
+                btn.className = 'chip-jenis px-3.5 py-1.5 rounded-full text-label-md font-label-md bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors active:scale-95 flex items-center gap-1.5 cursor-pointer';
                 if (iconEl) iconEl.textContent = defaultIkon;
             });
             updateAllReadouts();
@@ -1122,9 +1152,13 @@
                     if (s === 'hasil' || s === 'memuat') {
                         el.classList.add('flex');
                     }
+                    el.classList.remove('anim-panel');
+                    void el.offsetWidth;
+                    el.classList.add('anim-panel');
                 } else {
                     el.classList.add('hidden');
                     el.classList.remove('flex');
+                    el.classList.remove('anim-panel');
                 }
             }
         });
@@ -1151,9 +1185,17 @@
             v: selectedV
         };
 
+        const btnIcon = btnSubmit.querySelector('.material-symbols-outlined') || btnSubmit.querySelector('.animate-spin');
+        const btnText = document.getElementById('btn-submit-text');
+
         // Kondisi 2: Memuat
         switchPanel('memuat');
         btnSubmit.disabled = true;
+        if (btnIcon) {
+            btnIcon.className = 'w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin inline-block';
+            btnIcon.textContent = '';
+        }
+        if (btnText) btnText.textContent = 'Menghitung...';
 
         try {
             const response = await fetch('/api/rekomendasi', {
@@ -1200,21 +1242,34 @@
             renderHasil(data, payload);
             switchPanel('hasil');
 
+            // Gulir halus ke panel hasil pada layar kecil (< 1024px)
+            if (window.innerWidth < 1024) {
+                const panelKanan = document.getElementById('panel-kanan-kolom');
+                if (panelKanan) {
+                    panelKanan.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
         } catch (error) {
             document.getElementById('error-pesan').innerText = 'Tidak dapat menghubungi server, coba lagi.';
             switchPanel('error');
         } finally {
             btnSubmit.disabled = false;
+            if (btnIcon) {
+                btnIcon.className = 'material-symbols-outlined text-[24px]';
+                btnIcon.textContent = 'explore';
+            }
+            if (btnText) btnText.textContent = 'Tampilkan Rekomendasi';
         }
     });
 
 
 
-    // 11. Render Hasil: Semua 4 Kartu Seragam Template Seperti #4 Situ Cileunca
+    // 11. Render Hasil: Semua 5 Kartu Seragam Template Seperti #4 Situ Cileunca
     function renderHasil(data, payload) {
         const urut = data.urut || [];
-        // Tampilkan min(4, jumlah hasil)
-        const n = Math.min(4, urut.length);
+        // Tampilkan min(5, jumlah hasil)
+        const n = Math.min(5, urut.length);
 
         document.getElementById('hasil-jumlah-top').textContent = n;
         document.getElementById('hasil-subteks').textContent = `Menampilkan ${n} teratas dari ${data.jumlahKandidat} destinasi • Berdasarkan keberangkatan ${data.asal}`;
@@ -1239,7 +1294,8 @@
         topCards.forEach((item, index) => {
             const cardEl = document.createElement('article');
             cardEl.id = 'card-hasil-' + item.id;
-            cardEl.className = 'hasil-kartu bg-surface-container-lowest rounded-2xl border border-surface-variant/50 shadow-sm hover:shadow-md transition-all duration-300';
+            cardEl.className = 'hasil-kartu anim-up bg-surface-container-lowest rounded-2xl border border-surface-variant/50 shadow-sm hover:shadow-md transition-all duration-300';
+            cardEl.style.setProperty('--i', index);
 
             const fotoSrc = item.foto ? ('/images/destinasi/' + item.foto) : '/images/placeholder.jpg';
             const htmFormatted = item.biaya > 0 ? ('HTM Rp ' + Number(item.biaya).toLocaleString('id-ID')) : 'Gratis';
@@ -1282,7 +1338,7 @@
             cardEl.innerHTML = `
                 <!-- Foto di kiri selebar ~36% kartu (max 220px) pada desktop, tinggi 170px pada mobile -->
                 <div class="hasil-foto">
-                    <img alt="${escapeHtml(item.nama)}" class="object-cover" src="${fotoSrc}" onerror="this.src='/images/placeholder.jpg'">
+                    <img alt="${escapeHtml(item.nama)}" class="object-cover img-fade" src="${fotoSrc}" onerror="this.src='/images/placeholder.jpg'">
                     <div class="absolute top-3 left-3 px-3 py-1 rounded-full ${badgeBgClass} flex items-center gap-1.5 shadow-sm" style="${badgeStyle}">
                         <span>${badgeText}</span>
                     </div>
@@ -1304,7 +1360,7 @@
                                 </h3>
                             </div>
                             <div class="text-right shrink-0">
-                                <div class="font-headline-md text-headline-md font-bold text-primary leading-tight">${Number(item.persen).toFixed(1)}%</div>
+                                <div class="hasil-persen font-headline-md text-headline-md font-bold text-primary leading-tight">${Number(item.persen).toFixed(1)}%</div>
                             </div>
                         </div>
 
@@ -1347,7 +1403,16 @@
             `;
 
             container.appendChild(cardEl);
+
+            const persenEl = cardEl.querySelector('.hasil-persen');
+            if (persenEl && window.JJ && typeof window.JJ.countUp === 'function') {
+                window.JJ.countUp(persenEl, item.persen, { decimals: 1, suffix: '%' });
+            }
         });
+
+        if (window.JJ && typeof window.JJ.initImages === 'function') {
+            window.JJ.initImages(container);
+        }
     }
 
 
