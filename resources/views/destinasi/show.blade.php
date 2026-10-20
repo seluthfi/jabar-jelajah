@@ -57,7 +57,7 @@
 
         <!-- 2. Hero Visual Showcase -->
         <div class="w-full relative rounded-3xl overflow-hidden shadow-xl aspect-[16/9] md:aspect-[21/9] bg-surface-container group mb-10">
-            <img alt="{{ $destinasi->nama }}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]" src="{{ $fotoUrl }}">
+            <img alt="{{ $destinasi->nama }}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02] img-fade" src="{{ $fotoUrl }}">
             <!-- Gradient Overlay -->
             <div class="absolute inset-0 bg-gradient-to-t from-on-surface/85 via-on-surface/25 to-transparent"></div>
             <!-- Top Badges & Actions -->
@@ -74,7 +74,7 @@
             </div>
             <!-- Bottom Details -->
             <div class="absolute bottom-6 left-6 right-6 flex items-end justify-between">
-                <div class="text-surface">
+                <div class="text-surface" data-reveal="fade">
                     <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface/20 backdrop-blur-md text-surface font-label-sm text-label-sm mb-2">
                         <span class="material-symbols-outlined text-[14px]">location_on</span>
                         {{ $destinasi->wilayah }}
@@ -164,7 +164,7 @@
         <!-- 4. MAIN GRID: Left Content & Right Spec Box (Grid 3:2, items-stretch, mt-auto pada Daya Tarik Utama) -->
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch mb-10">
             <!-- Kartu Kiri: Pesona Keindahan Alam (3 cols) -->
-            <div class="lg:col-span-3 bg-surface-container-lowest rounded-3xl p-8 border border-surface-container-high/60 shadow-sm flex flex-col justify-between h-full">
+            <div class="lg:col-span-3 bg-surface-container-lowest rounded-3xl p-8 border border-surface-container-high/60 shadow-sm flex flex-col justify-between h-full" data-reveal style="--i:0">
                 <div>
                     <div class="flex items-center justify-between pb-4 border-b border-surface-container/60 mb-6">
                         <div class="flex items-center gap-3">
@@ -225,7 +225,7 @@
             </div>
 
             <!-- Kartu Kanan: Informasi & Tarif (2 cols) -->
-            <div class="lg:col-span-2 bg-surface-container-lowest rounded-3xl p-8 border border-surface-container-high/60 shadow-sm flex flex-col justify-between h-full space-y-5">
+            <div class="lg:col-span-2 bg-surface-container-lowest rounded-3xl p-8 border border-surface-container-high/60 shadow-sm flex flex-col justify-between h-full space-y-5" data-reveal style="--i:1">
                 <div class="space-y-5">
                     <div class="flex items-center justify-between pb-4 border-b border-surface-container/60">
                         <div>

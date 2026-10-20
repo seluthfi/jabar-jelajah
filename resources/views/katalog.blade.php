@@ -1,4 +1,4 @@
-git @extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
 <div class="flex flex-col w-full">
@@ -36,7 +36,7 @@ git @extends('layouts.app')
 
         <!-- 2. Interactive Category Filter Chips (Strictly Pill Links - No Form Inputs) -->
         <section class="mb-12">
-            <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+            <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none" data-reveal-group>
                 <!-- Active Chip: Semua -->
                 <a class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full {{ empty($selectedJenis) ? 'bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm hover:opacity-95' : 'bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container font-label-lg text-label-lg shadow-sm' }} transition-all flex-shrink-0" href="{{ route('katalog') }}">
                     <span class="material-symbols-outlined text-[18px]">travel_explore</span>
@@ -61,7 +61,7 @@ git @extends('layouts.app')
         </section>
 
         <!-- 3. Destination Cards Grid (3 Columns) -->
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" data-reveal-group>
             @php
                 $iconMap = [
                     'Pegunungan' => 'landscape',
@@ -76,10 +76,10 @@ git @extends('layouts.app')
                 @php
                     $iconJenis = $iconMap[$item->jenis] ?? 'landscape';
                 @endphp
-                <article class="group flex flex-col bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_4px_20px_-2px_rgba(46,125,91,0.06),0_2px_6px_-1px_rgba(31,41,55,0.04)] hover:shadow-[0_12px_28px_-4px_rgba(46,125,91,0.12),0_4px_12px_-2px_rgba(31,41,55,0.06)] transition-all duration-300">
+                <article class="card-lift group flex flex-col bg-surface-container-lowest rounded-2xl overflow-hidden shadow-[0_4px_20px_-2px_rgba(46,125,91,0.06),0_2px_6px_-1px_rgba(31,41,55,0.04)] hover:shadow-[0_12px_28px_-4px_rgba(46,125,91,0.12),0_4px_12px_-2px_rgba(31,41,55,0.06)] transition-all duration-300">
                     <div class="relative w-full aspect-[4/3] overflow-hidden bg-surface-container">
                         <a href="{{ url('/destinasi/' . $item->id) }}" class="block w-full h-full">
-                            <img alt="{{ $item->nama }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ $item->foto_url }}"/>
+                            <img alt="{{ $item->nama }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 img-fade" @if($loop->iteration > 3) loading="lazy" @endif src="{{ $item->foto_url }}"/>
                         </a>
                         <span class="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-surface/90 backdrop-blur-md text-primary font-label-sm text-label-sm shadow-sm flex items-center gap-1.5">
                             <span class="material-symbols-outlined text-[14px]">{{ $iconJenis }}</span>
@@ -147,7 +147,7 @@ git @extends('layouts.app')
 
         <!-- 4. Navigasi Pagination -->
         @if ($destinasi->hasPages())
-            <nav aria-label="Navigasi Halaman Destinasi" class="mt-16 pt-8 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-surface-container-highest">
+            <nav aria-label="Navigasi Halaman Destinasi" class="mt-16 pt-8 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-surface-container-highest" data-reveal="fade">
                 <!-- Status Keterangan Teks Halus -->
                 <p class="font-body-md text-body-md text-on-surface-variant text-center sm:text-left">
                     Menampilkan <span class="font-title text-title text-on-surface">{{ $destinasi->firstItem() }} - {{ $destinasi->lastItem() }}</span> dari <span class="font-title text-title text-on-surface">{{ $destinasi->total() }}</span> destinasi wisata
@@ -196,7 +196,7 @@ git @extends('layouts.app')
                 </div>
             </nav>
         @elseif ($destinasi->total() > 0)
-            <div class="mt-16 pt-8 flex items-center justify-between border-t border-surface-container-highest">
+            <div class="mt-16 pt-8 flex items-center justify-between border-t border-surface-container-highest" data-reveal="fade">
                 <p class="font-body-md text-body-md text-on-surface-variant">
                     Menampilkan <span class="font-title text-title text-on-surface">{{ $destinasi->firstItem() }} - {{ $destinasi->lastItem() }}</span> dari <span class="font-title text-title text-on-surface">{{ $destinasi->total() }}</span> destinasi wisata
                 </p>

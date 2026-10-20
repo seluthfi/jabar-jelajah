@@ -14,15 +14,15 @@
                 <span class="font-label-md text-label-md text-on-surface-variant tracking-wide font-medium">Rekomendasi Cerdas Wisata Tanah Pasundan</span>
             </div>
             <!-- Judul Utama -->
-            <h1 class="font-display text-display text-on-surface max-w-4xl tracking-tight leading-tight mb-6">
+            <h1 class="font-display text-display text-on-surface max-w-4xl tracking-tight leading-tight mb-6" data-reveal style="--i:0">
                 Temukan wisata Jawa Barat yang <span class="text-primary italic">pas untukmu</span>
             </h1>
             <!-- Subjudul Pendek -->
-            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-10 text-balance leading-relaxed">
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-10 text-balance leading-relaxed" data-reveal style="--i:1">
                 Jelajahi keindahan alam pegunungan, air terjun tersembunyi, hingga pantai eksotis di Jawa Barat sesuai preferensi liburanmu.
             </p>
             <!-- CTA Button & Fast Filter -->
-            <div class="flex flex-col sm:flex-row items-center gap-4 mb-14">
+            <div class="flex flex-col sm:flex-row items-center gap-4 mb-14" data-reveal style="--i:2">
                 <a class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-secondary-container hover:bg-secondary text-on-secondary-container hover:text-on-secondary font-headline-sm text-headline-sm transition-all duration-300 shadow-[0_8px_24px_rgba(254,165,65,0.35)] hover:shadow-[0_12px_28px_rgba(139,80,0,0.3)] hover:-translate-y-0.5 active:scale-95 group" data-path="cari-rekomendasi" href="{{ url('/rekomendasi') }}">
                     <span class="material-symbols-outlined text-2xl transition-transform duration-300 group-hover:rotate-45">explore</span>
                     <span>Cari Rekomendasi</span>
@@ -58,7 +58,7 @@
     <!-- SECTION CARA KERJA -->
     <section class="w-full py-20 lg:py-24 max-w-[1280px] mx-auto px-6 lg:px-12">
         <!-- Header Section -->
-        <div class="flex flex-col items-center text-center mb-16">
+        <div class="flex flex-col items-center text-center mb-16" data-reveal>
             <span class="px-3.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm uppercase tracking-wider mb-3">Panduan Mudah</span>
             <h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mb-3">Cara Kerja</h2>
             <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
@@ -66,7 +66,7 @@
             </p>
         </div>
         <!-- 3 Langkah Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative" data-reveal-group>
             <!-- Step 1 -->
             <div class="group relative flex flex-col p-8 rounded-2xl bg-surface-container-lowest shadow-[0_4px_20px_-2px_rgba(46,125,91,0.06),0_2px_6px_-1px_rgba(31,41,55,0.04)] hover:shadow-[0_12px_28px_-4px_rgba(46,125,91,0.12),0_4px_12px_-2px_rgba(31,41,55,0.06)] transition-all duration-300 hover:-translate-y-1">
                 <div class="flex items-center justify-between mb-8">
@@ -113,7 +113,7 @@
     <section class="w-full py-16 lg:py-24 bg-surface-container-low/40">
         <div class="max-w-[1280px] mx-auto px-6 lg:px-12">
             <!-- Section Header -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-12">
+            <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-12" data-reveal>
                 <div>
                     <span class="px-3.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm uppercase tracking-wider mb-2.5 inline-block">Favorit Petualang</span>
                     <h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Destinasi Populer Jawa Barat</h2>
@@ -125,11 +125,11 @@
                 </a>
             </div>
             <!-- 4 Kolom Destinasi Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" data-reveal-group>
                 @foreach ($populer as $item)
-                <article class="group flex flex-col rounded-2xl bg-surface-container-lowest overflow-hidden shadow-[0_4px_20px_-2px_rgba(46,125,91,0.06),0_2px_6px_-1px_rgba(31,41,55,0.04)] hover:shadow-[0_16px_32px_-4px_rgba(46,125,91,0.14)] transition-all duration-300 hover:-translate-y-1.5">
+                <article class="card-lift group flex flex-col rounded-2xl bg-surface-container-lowest overflow-hidden shadow-[0_4px_20px_-2px_rgba(46,125,91,0.06),0_2px_6px_-1px_rgba(31,41,55,0.04)] hover:shadow-[0_16px_32px_-4px_rgba(46,125,91,0.14)] transition-all duration-300 hover:-translate-y-1.5">
                     <div class="relative w-full aspect-[4/3] overflow-hidden">
-                        <img alt="{{ $item->nama }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="{{ $item->foto_url }}"/>
+                        <img alt="{{ $item->nama }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 img-fade" src="{{ $item->foto_url }}"/>
                         <div class="absolute inset-0 bg-gradient-to-t from-on-surface/60 via-transparent to-transparent opacity-60"></div>
                         <div class="absolute top-3 left-3">
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm shadow-sm">
@@ -176,7 +176,7 @@
     </section>
 
     <!-- CALL TO ACTION BANNER -->
-    <section class="w-full py-16 max-w-[1280px] mx-auto px-6 lg:px-12">
+    <section class="w-full py-16 max-w-[1280px] mx-auto px-6 lg:px-12" data-reveal="scale">
         <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary to-primary-container p-10 lg:p-14 text-on-primary shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
             <div class="absolute -right-10 -bottom-10 w-72 h-72 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
             <div class="max-w-xl text-center md:text-left z-10">

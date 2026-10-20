@@ -146,3 +146,42 @@
 ::-webkit-scrollbar {
     display: none;
 }
+
+:root {
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --dur-fast: 150ms;
+    --dur-base: 300ms;
+    --dur-slow: 600ms;
+}
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 200ms; }
+.site-header { view-transition-name: site-header; transition: box-shadow var(--dur-base) var(--ease-out); }
+.site-header[data-scrolled="true"] { box-shadow: 0 6px 24px rgba(9, 100, 68, 0.10); }
+
+@media (prefers-reduced-motion: no-preference) {
+    html.js :is([data-reveal], [data-reveal-group] > *) {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+        transition-delay: calc(var(--i, 0) * 70ms);
+    }
+    html.js [data-reveal="fade"]  { transform: none; }
+    html.js [data-reveal="scale"] { transform: scale(0.96); }
+    html.js :is([data-reveal], [data-reveal-group] > *).is-visible { opacity: 1; transform: none; }
+    html.js :is([data-reveal], [data-reveal-group] > *).reveal-done { transition-delay: 0s; transition-duration: var(--dur-base); }
+    html.js .card-lift.is-visible:hover { transform: translateY(-4px); }
+
+    @keyframes jj-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    @keyframes jj-bump { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    @keyframes jj-spin-once { to { transform: rotate(360deg); } }
+    .anim-up { animation: jj-up var(--dur-slow) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    .anim-panel { animation: jj-up var(--dur-base) var(--ease-out) both; }
+    .anim-bump { animation: jj-bump 180ms var(--ease-out); }
+    .anim-spin-once { animation: jj-spin-once 500ms var(--ease-out); }
+
+    html.js img.img-fade { opacity: 0; transition: opacity 500ms var(--ease-out); }
+    html.js img.img-fade.is-loaded { opacity: 1; }
+
+    .card-lift { transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out); }
+    .card-lift:hover { transform: translateY(-4px); }
+}

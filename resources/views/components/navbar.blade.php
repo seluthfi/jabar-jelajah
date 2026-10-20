@@ -1,4 +1,4 @@
-<header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+<header class="site-header fixed top-0 left-0 right-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
     <div class="h-20 max-w-[1280px] mx-auto px-6 lg:px-12 flex items-center justify-between">
         <div class="flex items-center gap-8">
             <a class="flex items-center gap-3 group" data-path="beranda" href="{{ url('/') }}">
